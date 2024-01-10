@@ -1,0 +1,2 @@
+# musings
+ various musings
