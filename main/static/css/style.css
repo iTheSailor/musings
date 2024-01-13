@@ -1,0 +1,24 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+#map{
+    height:100%;
+}
+.content {
+    flex: 1;  /* This line will make the content area grow to fill the space */
+}
+
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: top;
+    background-color: rgb(61, 84, 77);
+}

@@ -1,0 +1,23 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    flex: 1;  /* This line will make the content area grow to fill the space */
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: top;
+    background-color: rgb(61, 84, 77);
+    color: white;
+}
