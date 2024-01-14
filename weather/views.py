@@ -1,7 +1,8 @@
 from django.shortcuts import render
 import os
-from . import maps
+from . import forecast, maps
 import requests
+from datetime import datetime
 
 # Create your views here.
 
@@ -14,18 +15,18 @@ def weather(request):
 def weather_at_location(request):
     address = request.GET['address']
     location = maps.geocode(address)
-    
     long = location['lng']
     lat = location['lat']
-    #  get weather from https://api.weather.gov/points/{latitude},{longitude}
-    get_weather = requests.get(f'https://api.weather.gov/points/{lat},{long}')
-    weather_json = get_weather.json()
-    forecast_url = weather_json['properties']['forecast']
-    forecast = requests.get(forecast_url).json()
+    print(long, lat)
+    _forecast = forecast.get_weather(lat, long)
+    organized_forecast = {datetime.strptime(date, '%Y-%m-%d'): periods for date, periods in _forecast.items()}
+    print(organized_forecast)
     
+
     context = {
         'gmaps_key': os.environ['GMAPS_KEY'],
-        'forecast': forecast,
+        'forecast': organized_forecast,
+        'address': address,
     }
     return render(request, 'weather/partials/weather_at_location.html', context)
 

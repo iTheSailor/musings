@@ -1,0 +1,8 @@
+.weatherCard{
+    background-color: aqua;
+}
+
+.weatherCardRow{
+    background-color: black;
+    justify-content: space-between;
+}
