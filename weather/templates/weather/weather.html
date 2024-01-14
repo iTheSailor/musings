@@ -1,0 +1,37 @@
+{% extends "main/index.html" %}
+{% load static %}
+{% block content %}
+
+<div id="map"></div>
+<div class="container">
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                <h1 class="text-center">Weather</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h2 class="text-center">
+                    <span>Where do you want to search?</span>
+                </h2>
+                <h3 class="text-center">
+                    <form action="{% url 'weatherAtLocation' %}" method="get" >
+                        <input type="text" id="search" name="address" placeholder="Search">
+                        <input type="submit" value="Search">
+                    </form>
+                </h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {% block content2 %}
+                {% endblock content2 %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'weather/js/weather.js' %}" defer></script>
+
+{% endblock content %}
