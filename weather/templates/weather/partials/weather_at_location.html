@@ -1,35 +1,52 @@
-{% extends "weather/weather.html" %}
-{% load static %}
-{% block content2 %}
+{% extends "weather/weather.html" %} {% load static %} {% block content2 %}
 <div class="row">
-    <div class="col">
-        <h2 class="text-center">
-            <span>Weather at {{address|upper}}</span>
-        </h2>
-    </div>
+  <div class="col">
+    <h2 class="text-center">
+      <span>Weather at {{address|upper}}</span>
+    </h2>
+  </div>
 </div>
 <div class="row">
-    <div class="col d-flex weatherCardRow">
+  <div class="col d-flex weatherCardRow">
+    {% for date, periods in forecast.items %}
+    <div class="card m-2 weatherCard" onclick="showDetailedForecast('{{date|date:'Ymd'}}')">
+      <div class="card-body">
+        <h5 class="card-title">{{ date|date }}</h5>
+        {% for period in periods %}
+        <p class="card-text">
+          <strong>{{ period.name }}</strong>: {{ period.temperature }}°{{period.temperatureUnit }}
+        </p>
+        <p class="card-text">{{ period.shortForecast }}</p>
+        <p class="card-text">
+          Wind: {{ period.windSpeed }}, {{ period.windDirection }}
+        </p>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="row">
+    <div class="col">
         {% for date, periods in forecast.items %}
-    <div class="card m-2 ">
-        <div class="card-body weatherCard">
-            <h5 class="card-title">{{ date|date }}</h5>
-            {% for period in periods %}
-                <p class="card-text"><strong>{{ period.name }}</strong>: {{ period.temperature }}°{{ period.temperatureUnit }}</p>
-                <p class="card-text">{{ period.shortForecast }}</p>
-                <p class="card-text">Wind: {{ period.windSpeed }}, {{ period.windDirection }}</p>
-                
+        <div>
+            <div class="row">
+                <div class="col">
+                    <div id="{{date|date:'Ymd'}}" class="detailedCard">
+                        {% for period in periods %}
+                        <p>
+        
+                            {{ period.detailedForecast }}
+                        </p>
+                        {% endfor %}
+                    </div>
+                    
+                </div>
+            </div>
             {% endfor %}
         </div>
     </div>
-{% endfor %}
-
-    <div>
-        
-    </div>
-</div>
-
-
 </div>
 
 {% endblock content2 %}

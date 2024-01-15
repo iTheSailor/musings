@@ -1,8 +1,48 @@
 .weatherCard{
-    background-color: aqua;
+    width: 13%;
+    border: 2px solid black;
+    border-radius: 10px;
+    transition-duration: .25s;
+    background-color: rgb(192, 181, 168);
+}
+.weatherCard:hover{
+    background-color: rgb(237, 236, 236);
+    cursor:pointer;
+
 }
 
 .weatherCardRow{
-    background-color: black;
+    /* background-color: black; */
     justify-content: space-between;
+}
+.detailedCard{
+    background-color: beige;
+    border: 2px solid black;
+    display: none;
+    transition-duration: .25s;
+}
+.dc-show{
+    display: block;
+    transition-duration: .25s;
+}
+
+.radioGroup{
+    margin:auto;
+    width: 35vw;
+    display:flex;
+    justify-content: space-around;
+}
+
+.searchBar{
+    margin:auto;
+    width: 45vw;
+    display:block;
+}
+
+#searchZip{
+    width: 20vw;
+}
+
+#searchAddress{
+    width: 20vw;
 }

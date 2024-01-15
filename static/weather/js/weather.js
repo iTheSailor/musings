@@ -1,7 +1,23 @@
-function initMap(){
-    var options = {
-        zoom: 8,
-        center: {lat: 42.3601, lng: -71.0589}
+function showDetailedForecast(e){
+    console.log(e);
+    details = document.getElementById(e);
+    shown_details = document.getElementsByClassName('detailedCard');
+    for (var i = 0; i < shown_details.length; i++) {
+        shown_details[i].classList.remove('dc-show');
     }
-    var map = new google.maps.Map(document.getElementById('map'), options);
+    details.classList.add('dc-show');
+}
+
+function toggleSearchType() {
+    var searchType = document.querySelector('input[name="searchType"]:checked').value;
+    var searchZip = document.getElementById('searchZip');
+    var searchAddress = document.getElementById('searchAddress');
+    
+    if (searchType === 'zip') {
+        searchZip.style.display = '';
+        searchAddress.style.display = 'none';
+    } else {
+        searchZip.style.display = 'none';
+        searchAddress.style.display = '';
+    }
 }
