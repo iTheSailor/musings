@@ -6,6 +6,7 @@ function showDetailedForecast(e){
         shown_details[i].classList.remove('dc-show');
     }
     details.classList.add('dc-show');
+    triggerHourly(e);
 }
 
 function toggleSearchType() {

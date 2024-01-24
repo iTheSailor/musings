@@ -2,8 +2,10 @@ import googlemaps
 from datetime import datetime
 from django.conf import settings
 import os
+import requests
+import json
 
-gmaps = googlemaps.Client(key=os.environ.get('GMAPS_KEY'))
+geocode_key = os.environ['GEOCODE_KEY']
 
 def geocode(query, search_type):
 
@@ -18,7 +20,15 @@ def geocode(query, search_type):
                     return lat, long
                     
     else:
-        geocode_result = gmaps.geocode(query)
-        print(geocode_result)
-        return geocode_result[0]['geometry']['location']
+        query = query.replace(' ', '+')
+        geocode_url = f"https://api.geocod.io/v1.7/geocode?q={query}&api_key={geocode_key}"
+        print(geocode_url)
+        coordinates = requests.get(geocode_url).json()
+        lat = coordinates['results'][0]['location']['lat']
+        long = coordinates['results'][0]['location']['lng']
+        print(lat, long)
+        return lat, long
+
+
+        
 

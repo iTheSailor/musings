@@ -33,13 +33,24 @@
         <div>
             <div class="row">
                 <div class="col">
-                    <div id="{{date|date:'Ymd'}}" class="detailedCard">
-                        {% for period in periods %}
+                    <div id="{{date|date:'Ymd'}}" class="detailedCard m-3 p-2">
+                        
+                        {% if periods|length > 1 %}
                         <p>
-        
-                            {{ period.detailedForecast }}
+                          <strong>Daytime:</strong>
+                            {{ periods.0.detailedForecast }}
                         </p>
-                        {% endfor %}
+                        <p>
+                          <strong>Nighttime:</strong>
+                            {{ periods.1.detailedForecast }}
+                        </p>
+
+                        {% else %}
+                        <p>
+                            {{ periods.0.detailedForecast }}
+                        </p>
+                        {% endif %}
+                        
                     </div>
                     
                 </div>
@@ -48,5 +59,6 @@
         </div>
     </div>
 </div>
+
 
 {% endblock content2 %}
