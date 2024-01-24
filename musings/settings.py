@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'weather',
+    'todo',
+    'sudoku',
 ]
 
 MIDDLEWARE = [

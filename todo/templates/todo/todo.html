@@ -1,0 +1,38 @@
+{% extends "main/index.html" %} {% load static %} {% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="d-flex justify-content-between">
+
+                <h1>Todo</h1>
+            </div>
+            {%block content2%}
+            <a href="{% url 'add' %}">Add a new todo</a>
+            {%endblock content2%}
+            <p>Here are your todos:</p>
+            <ul>
+              {% for todo in todos %}
+              <ul>
+                <strong> {{ todo.title }} </strong>
+                {{ todo.details}} {{ todo.duedate}}
+                <a href="{% url 'deleteTodo' todo.id %}">Delete</a>
+                <a href="{% url 'editTodo' todo.id %}">Edit</a>
+                <a href="{% url 'completeTodo' todo.id %}">Complete</a>
+            
+              </ul>
+              {% endfor %}
+            </ul>
+            <p>Here is tasks you have finished:
+            </p>
+              {% for todo in donetodos %}
+                <ul>
+                    <strong> {{ todo.title }} </strong>
+                    {{ todo.details}} {{ todo.duedate}}
+                    <a href="{% url 'deleteTodo' todo.id %}">Delete</a>
+                </ul>
+                {% endfor %}
+
+        </div>    
+    </div>    
+</div>    
+{% endblock %}
