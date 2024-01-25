@@ -1,64 +1,36 @@
 {% extends 'main/index.html' %} {% block content %} {% load static %}
-<!-- sudoku board -->
-<style>
-    .sudoku-board {
-        display: grid;
-        grid-template-columns: repeat(9, 1fr);
-        grid-gap: 2px;
-        max-width: 450px;
-        margin: auto;
-    }
-    .sudoku-cell {
-        width: 50px;
-        height: 50px;
-        border: 1px solid black;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-    }
-    .bold-border-right {
-        border-right: 3px solid black;
-    }
-    .bold-border-bottom {
-        border-bottom: 3px solid black;
-    }
-    input {
-        width: 100%;
-        height: 100%;
-        border: none;
-        text-align: center;
-        font-size: 20px;
-    }
-    input:focus {
-        outline: none;
-    }
-</style>
-<div class="sudoku-board" id="sudokuBoard">
-    <!-- JavaScript will populate this div -->
+<head>
+    <script src="{% static 'sudoku/js/sudoku.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'sudoku/css/sudoku.css' %}" />
+</head>
+ 
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="sudoku-title text-center">
+                <h1>Sudoku</h1>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="playarea d-flex justify-content-evenly">
+                        <div class="toolbelt d-flex flex-column">
+                            <button class="btn btn-light" id="valuelock" ><i class="fa-solid fa-lock"></i> Lock Cells</button>
+                            <br>
+                            <button class="btn btn-light" id="valueunlock" ><i class="fa-solid fa-unlock"></i> Unlock Cells</button>
+                            <br>
+                            <button class="btn btn-light" id="changecolor" ><i class="fa-solid fa-palette"></i> Change Color</button>
+                        </div>
+                        <div class="sudoku-board" id="sudokuBoard"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-    const board = document.getElementById('sudokuBoard');
+    
+</div>
 
-    for (let row = 0; row < 9; row++) {
-        for (let col = 0; col < 9; col++) {
-            const cell = document.createElement('div');
-            cell.className = 'sudoku-cell';
-            if (col === 2 || col === 5) cell.classList.add('bold-border-right');
-            if (row === 2 || row === 5) cell.classList.add('bold-border-bottom');
 
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.min = 1;
-            input.max = 9;
-            cell.appendChild(input);
-
-            board.appendChild(cell);
-        }
-    }
-});
-</script>
 
 {% endblock %}
