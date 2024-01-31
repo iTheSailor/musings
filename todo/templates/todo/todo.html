@@ -1,36 +1,100 @@
-{% extends "main/index.html" %} {% load static %} {% block content %}
-<div class="container">
+{% extends "main/index.html" %} {%load bootstrap5%} {% load static %} {% block content %}
+<div class="container-fluid w-75">
     <div class="row">
         <div class="col">
-            <div class="d-flex justify-content-between">
-
-                <h1>Todo</h1>
+          <br>
+            <div class="d-flex justify-content-around">
+                <div>
+                  <h1>Todo</h1>
+                </div>
             </div>
+            <br>
+
             {%block content2%}
-            <a href="{% url 'add' %}">Add a new todo</a>
-            {%endblock content2%}
-            <p>Here are your todos:</p>
-            <ul>
-              {% for todo in todos %}
-              <ul>
-                <strong> {{ todo.title }} </strong>
-                {{ todo.details}} {{ todo.duedate}}
-                <a href="{% url 'deleteTodo' todo.id %}">Delete</a>
-                <a href="{% url 'editTodo' todo.id %}">Edit</a>
-                <a href="{% url 'completeTodo' todo.id %}">Complete</a>
-            
-              </ul>
-              {% endfor %}
-            </ul>
-            <p>Here is tasks you have finished:
-            </p>
-              {% for todo in donetodos %}
-                <ul>
-                    <strong> {{ todo.title }} </strong>
-                    {{ todo.details}} {{ todo.duedate}}
-                    <a href="{% url 'deleteTodo' todo.id %}">Delete</a>
-                </ul>
+            <div class="row d-flex justify-content-evenly" style="background-color: rgba(141, 143, 142, 0.108);">
+
+              <div class="col-5">
+              <h3>Here are your todos:</h3>
+              <table class="table  table-striped mb-5">
+                <tr>
+                  <th>
+                    <strong>Done?</strong>
+                  </th>
+                  <th>
+                    <strong>Title</strong>
+                  </th>
+                  <th>
+                    <strong>Details</strong>
+                  </th>
+                  <th>
+                    <strong>Due Date</strong>
+                  </th>
+                  <th>
+                    <strong>Actions</strong>
+                  </th>
+                </tr>
+                {% for todo in todos %}
+                <tr>
+                  <td>
+                    <a class="btn btn-sm btn-success" type="checkbox" href="{%url 'completeTodo' todo.id %}" value="">Done!</a>
+                  </td>
+                  <td>
+                    {{ todo.title }}
+                  </td>
+                  <td>
+                    {{ todo.details}}
+                  </td>
+                  <td>
+                    {{ todo.duedate}}
+                  </td>
+                  <td>
+                    <a href="{% url 'editTodo' todo.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                    <a href="{% url 'deleteTodo' todo.id %}" class="btn btn-sm btn-danger">Delete</a>
+                  </td>
+                </tr>
                 {% endfor %}
+              </table>
+              <a href="{% url 'add' %}" class="btn btn-light">Add a new todo</a>
+              </div>
+              
+              <div class="col-5">
+              <h3>Here are your completed todos:</h3>
+              <table class="table table-striped mb-5">
+                <tr>
+                  <th>
+                    <strong>Title</strong>
+                  </th>
+                  <th>
+                    <strong>Details</strong>
+                  </th>
+                  <th>
+                    <strong>Due Date</strong>
+                  </th>
+                  <th>
+                    <strong>Actions</strong>
+                  </th>
+                </tr>
+                {% for todo in donetodos %}
+                <tr>
+                  <td>
+                    {{ todo.title }}
+                  </td>
+                  <td>
+                    {{ todo.details}}
+                  </td>
+                  <td>
+                    {{ todo.duedate}}
+                  </td>
+                  <td>
+                    <a href="{% url 'deleteTodo' todo.id %}" class="btn btn-sm btn-danger">Delete</a>
+                  </td>
+                </tr>
+                {% endfor %}
+
+              </table>
+              </div>
+            </div>
+              {%endblock content2%}
 
         </div>    
     </div>    

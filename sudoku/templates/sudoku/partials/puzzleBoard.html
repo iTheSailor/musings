@@ -1,0 +1,14 @@
+{% load static %}{% block content2 %}
+
+            <div class="toolbelt d-flex flex-column">
+                <button class="btn btn-light" style="margin-top:1rem;" id="valuelock" ><i class="fa-solid fa-lock"></i> Lock Cells</button>
+                <br>
+                <button class="btn btn-light" id="valueunlock" ><i class="fa-solid fa-unlock"></i> Unlock Cells</button>
+                <br>
+                <button class="btn btn-success border-dark" style="margin-top:auto; margin-bottom: 0; color:black;" id="submit" ><i class="fa-solid fa-check"></i> Submit!</button>
+            </div>
+            <!-- {{ puzzle_board|json_script:"puzzleBoardData" }} -->
+            <div class="sudoku-board" id="sudokuBoard"></div>
+
+<script src="{% static 'sudoku/js/sudoku_real.js' %}" defer></script>
+{% endblock content2 %}

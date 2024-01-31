@@ -47,11 +47,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "template_partials",
     'fontawesomefree',
+    'bootstrap5',
     'main',
     'weather',
     'todo',
     'sudoku',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [

@@ -1,8 +1,8 @@
-{% extends 'main/index.html' %} {% block content %} {% load static %}
-<head>
-    <script src="{% static 'sudoku/js/sudoku.js' %}"></script>
+{% extends 'main/index.html' %} 
+{% load static %} {% block content %}
+    
     <link rel="stylesheet" href="{% static 'sudoku/css/sudoku.css' %}" />
-</head>
+
  
 <div class="container">
     <div class="row">
@@ -10,20 +10,21 @@
             <div class="sudoku-title text-center">
                 <h1>Sudoku</h1>
             </div>
+            {% block content2 %}
             <div class="row">
                 <div class="col">
-                    <div class="playarea d-flex justify-content-evenly">
-                        <div class="toolbelt d-flex flex-column">
-                            <button class="btn btn-light" id="valuelock" ><i class="fa-solid fa-lock"></i> Lock Cells</button>
-                            <br>
-                            <button class="btn btn-light" id="valueunlock" ><i class="fa-solid fa-unlock"></i> Unlock Cells</button>
-                            <br>
-                            <button class="btn btn-light" id="changecolor" ><i class="fa-solid fa-palette"></i> Change Color</button>
-                        </div>
+                    <div class="playarea d-flex justify-content-evenly" id="preset">
                         <div class="sudoku-board" id="sudokuBoard"></div>
+                        
+                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#puzzleInit">
+                            Start a Puzzle
+                          </button>
+                          
+                        </div>
+                        
                     </div>
                 </div>
-            </div>
+            {% endblock content2 %}
         </div>
     </div>
 </div>
@@ -31,6 +32,41 @@
     
 </div>
 
+  
+  <!-- Modal -->
+  <div class="modal fade" id="puzzleInit" tabindex="-1" aria-labelledby="puzzleInitLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Start a Puzzle
+                </h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+            </div>
+            <div class="modal-body">
+                    <form hx-post="{{request.path}}puzzle_init" class="modal-content">
+                    <label for="difficulty">Select Difficulty:</label>
+                   
+                        
+                        <select id="difficulty" name="difficulty" >
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" hx-target="#preset" hx-swap-oob="innerHTML" hx-post="{% url 'generate_puzzle' %}" aria-label="Close">
+                        <span aria-hidden="true">Success</span>
+                      </button>  
+                     
+                    </form>
+                    </div>
+                </div>
+    </div>
+  </div>
 
+  <script src="{% static 'sudoku/js/sudoku.js' %}" defer></script>
 
 {% endblock %}
+

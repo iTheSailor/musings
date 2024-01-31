@@ -1,24 +1,31 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from .models import TodoItem
+from django.views.generic import FormView
+from .forms import TodoItemForm
 
 # Create your views here.
 
 def todo (request):
     todos = TodoItem.objects.filter(completed=False)
+    print(todos)
     donetodos = TodoItem.objects.filter(completed=True)
     context = {'todos': todos, 'donetodos': donetodos}
     return render(request, 'todo/todo.html', context)
 
-def add (request):
-    return render(request, 'todo/partials/add.html')
+class AddView (FormView):
+    template_name = 'todo/partials/add.html'
+    form_class = TodoItemForm
+    def get_success_url(self):
+        print('success')
+        print(self.request.POST)
+        form = TodoItemForm(self.request.POST)
+        if form.is_valid():
+            form.save()
+            return reverse('todo')
+        else:
+            return reverse('add')
 
-def addTodo (request):
-    data = request.POST
-    title = data['title']
-    details = data['details']
-    duedate = data['date']
-    TodoItem.objects.create(title=title, details=details, duedate=duedate)
-    return redirect('todo')
 
 def deleteTodo (request, todo_id):
     TodoItem.objects.get(id=todo_id).delete()

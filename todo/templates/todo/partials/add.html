@@ -1,23 +1,25 @@
 {% extends 'todo/todo.html' %}
+{% load static %}
+{% load bootstrap5 %}
 
 {% block content2 %}
 <!-- adding a new todo -->
-
-<h3>Add a new todo</h3>
-<div class="row">
-    <div class="col">
-        
-        <form action="{% url 'addTodo' %}" method="post">
-            {% csrf_token %}
-            <label for="title">Title:</label>
-            <input type="text" name="title" id="todoTitle">
-            <label for="date">Date:</label>
-            <input type="date" name="date" id="todoDate">
-            <label for="details">Details:</label>
-            <input type="text" name="details" id="todoDetails">
-            <input type="submit" value="Add">
-        </form>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h3>Add a new todo</h3>
+            <form role="form" method="post" action="" class="text-dark">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                {% buttons submit='Add' reset='Reset'%}
+                {% endbuttons %}
+            
+                <a href="../" type="button" class="btn btn-danger">Cancel</a>
+            </form>
+        </div>
     </div>
 </div>
+
+
 
 {% endblock content2 %}
