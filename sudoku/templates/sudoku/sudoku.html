@@ -13,17 +13,27 @@
             {% block content2 %}
             <div class="row">
                 <div class="col">
-                    <div class="playarea d-flex justify-content-evenly" id="preset">
-                        <div class="sudoku-board" id="sudokuBoard"></div>
-                        
-                        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#puzzleInit">
+                    <div id="preset">
+                    <div class="d-flex align-center justify-content-evenly mt-4">
+                        <div class="col-2 d-flex flex-column">
+                            <button type="button" class="btn btn-light mt-auto mb-2" data-bs-toggle="modal" data-bs-target="#puzzleInit"
+                            id="startButton">
                             Start a Puzzle
-                          </button>
-                          
-                        </div>
-                        
+                        </button>
+                        <button class="btn-warning btn mb-auto">
+                            Continue
+                        </button>
                     </div>
+                    <div class="col-10 sudoku-board m-auto" id="sudokuBoardDummy"></div>
+                    
+                    
                 </div>
+                
+            </div>
+        </div>
+        <script src="{% static 'sudoku/js/sudoku.js' %}" defer></script>
+
+        </div>
             {% endblock content2 %}
         </div>
     </div>
@@ -37,7 +47,6 @@
   <div class="modal fade" id="puzzleInit" tabindex="-1" aria-labelledby="puzzleInitLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header">
             <div class="modal-header">
                 <h5 class="modal-title">
                     Start a Puzzle
@@ -48,16 +57,19 @@
             </div>
             <div class="modal-body">
                     <form hx-post="{{request.path}}puzzle_init" class="modal-content">
-                    <label for="difficulty">Select Difficulty:</label>
-                   
-                        
-                        <select id="difficulty" name="difficulty" >
-                            <option value="easy">Easy</option>
-                            <option value="medium">Medium</option>
-                            <option value="hard">Hard</option>
-                        </select>
-                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" hx-target="#preset" hx-swap-oob="innerHTML" hx-post="{% url 'generate_puzzle' %}" aria-label="Close">
-                        <span aria-hidden="true">Success</span>
+                        <div class="form-control form-group">
+
+                            <label for="difficulty">Select Difficulty:</label>
+                            <br>
+                                <select id="difficulty" name="difficulty" >
+                                    <option value="test">test</option>
+                                    <option value="easy">Easy</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="hard">Hard</option>
+                                </select>
+                        </div>
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" hx-target="#preset" hx-swap-oob="outerHTML" hx-post="{% url 'generate_puzzle' %}" aria-label="Close" >
+                        <span aria-hidden="true" >Start</span>
                       </button>  
                      
                     </form>
@@ -66,7 +78,7 @@
     </div>
   </div>
 
-  <script src="{% static 'sudoku/js/sudoku.js' %}" defer></script>
+
 
 {% endblock %}
 
