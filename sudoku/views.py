@@ -9,7 +9,9 @@ from .models import Sudoku
 # Create your views here.
 
 def sudoku(request):
-    return render(request, 'sudoku/sudoku.html')
+    existing_game = Sudoku.objects.filter(player=request.user).order_by('-created_at')
+    context = {'existing_game': existing_game}
+    return render(request, 'sudoku/sudoku.html', context)
 
 @csrf_exempt
 def save_game(request):
@@ -39,15 +41,24 @@ def save_game(request):
     )
 
     return JsonResponse({'success': True, 'message': 'Game saved successfully'})
+def existing_game(request):
+    user=request.user
+    if not user.is_authenticated:
+        return JsonResponse({'success': False, 'message': 'User not authenticated'})
+    game=Sudoku.objects.filter(player=user).order_by('-created_at')
+    if not game:
+        return JsonResponse({'success': False, 'message': 'No game found'})
+    return JsonResponse({'success': True, 'game': game})
 
 def load_game(request):
     user=request.user
     if not user.is_authenticated:
         return JsonResponse({'success': False, 'message': 'User not authenticated'})
-    game=Sudoku.objects.filter(player=user).order_by('-created_at').first()
+    game=Sudoku.objects.filter(player=user).order_by('-created_at')
+    request.session['sudoku_solution'] = game.solution
     if not game:
         return JsonResponse({'success': False, 'message': 'No game found'})
-    return JsonResponse({'success': True, 'game': game})
+    return render(request, 'sudoku/partials/', context)
 @csrf_exempt
 def generate_puzzle(request):
     difficulty = request.POST.get('difficulty')
@@ -55,6 +66,13 @@ def generate_puzzle(request):
     puzzle_board = boards[0].tolist()
     solution = boards[1].tolist()
     request.session['sudoku_solution'] = solution
+    Sudoku.objects.create(
+        player=request.user,
+        puzzle=json.dumps(puzzle_board),
+        solution=json.dumps(solution),
+        current_state = json.dumps(puzzle_board),
+        difficulty=difficulty
+    )
     # print(puzzle_board)
     # print(f'solution board {solution}')
     context = {'puzzle_board' : puzzle_board}

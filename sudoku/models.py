@@ -8,10 +8,10 @@ class Sudoku(models.Model):
     solution = models.TextField()
     current_state = models.TextField()
     difficulty = models.CharField(max_length=10)
-    time = models.IntegerField()
+    time = models.IntegerField(null=True, blank=True)
     is_finished = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'Sudoku by {self.player.username} on {self.created_at.strftime("%d-%b-%Y")}'
+        return f'{self.difficulty.title} Sudoku on {self.created_at.strftime("%d-%b-%Y")}'

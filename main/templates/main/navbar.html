@@ -52,19 +52,15 @@
                     </div>
                 </li>
             </ul>
-            <form class="d-flex my-2 my-lg-0">
-                <input
-                    class="form-control me-sm-2"
-                    type="text"
-                    placeholder="Search"
-                />
-                <button
-                    class="btn btn-outline-success my-2 my-sm-0"
-                    type="submit"
-                >
-                    Search
-                </button>
-            </form>
+            
+            <!-- login -->
+            <div class="d-flex">
+                {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline-primary">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-outline-primary">Register</a>
+                {% endif %}
         </div>
     </div>
 </nav>

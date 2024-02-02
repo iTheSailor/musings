@@ -20,7 +20,7 @@
                             id="startButton">
                             Start a Puzzle
                         </button>
-                        <button class="btn-warning btn mb-auto">
+                        <button class="btn-warning btn mb-auto" >
                             Continue
                         </button>
                     </div>
@@ -62,6 +62,40 @@
                             <label for="difficulty">Select Difficulty:</label>
                             <br>
                                 <select id="difficulty" name="difficulty" >
+                                    <option value="test">test</option>
+                                    <option value="easy">Easy</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="hard">Hard</option>
+                                </select>
+                        </div>
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" hx-target="#preset" hx-swap-oob="outerHTML" hx-post="{% url 'generate_puzzle' %}" aria-label="Close" >
+                        <span aria-hidden="true" >Start</span>
+                      </button>  
+                     
+                    </form>
+                    </div>
+                </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="puzzleCont" tabindex="-1" aria-labelledby="puzzleConttLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Start a Puzzle
+                </h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+            </div>
+            <div class="modal-body">
+                    <form hx-post="{{request.path}}load_game" class="modal-content">
+                        <div class="form-control form-group">
+
+                            <label for="games">Select Game:</label>
+                            <br>
+                                <select id="games" name="games" >
                                     <option value="test">test</option>
                                     <option value="easy">Easy</option>
                                     <option value="medium">Medium</option>
