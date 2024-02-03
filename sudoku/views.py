@@ -106,12 +106,16 @@ def generate_puzzle(request):
         current_state = json.dumps(puzzle_board),
         difficulty=difficulty
     )
+    enhanced_current_state = enhance_state_with_clues(puzzle_board, puzzle_board)
     game_id = Sudoku.objects.latest('id').id
     context = {
         'game_id': game_id,
         'puzzle_board' : puzzle_board,
+        'current_state': enhanced_current_state,
         'difficulty': difficulty,
         'new_game': True}
+    
+    
     response = render(request, 'sudoku/partials/puzzleBoard.html', context)
     return trigger_client_event(response, "loadBoard", after="swap")
 

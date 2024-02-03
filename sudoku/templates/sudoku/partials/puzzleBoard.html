@@ -8,18 +8,16 @@
 <div class="d-flex align-center justify-content-evenly mt-4">
 
     <div class="toolbelt d-flex flex-column">
-        <button class="btn btn-light" style="margin-top:1rem;" id="valuelock" ><i class="fa-solid fa-lock"></i> Lock Cells</button>
+        <button class="btn starterButtons" style="margin-top:1rem;" id="valuelock" ><i class="fa-solid fa-lock"></i> Lock Cells</button>
         <br>
-        <button class="btn btn-light" id="valueunlock" ><i class="fa-solid fa-unlock"></i> Unlock Cells</button>
+        <button class="btn starterButtons" id="valueunlock" ><i class="fa-solid fa-unlock"></i> Unlock Cells</button>
         <br>
         <button class="btn btn-primary" value="{{game_id}}" style="margin-top:auto; margin-bottom: 2rem; color:black;" id="save" ><i class="fa-solid fa-save"></i> Save Game</button>
         <button class="btn btn-success border-dark" style=" margin-bottom: 0; color:black;" id="submit" ><i class="fa-solid fa-check"></i> Submit!</button>
     </div>
-    {% if new_game%}
-    {{ puzzle_board|json_script:"puzzleBoardData" }}
-    {% else %}
+    
     {{ current_state|json_script:"puzzleBoardData" }}
-    {% endif %}
+   
     <div class="sudoku-board" id="sudokuBoard"></div>
 
 </div>
