@@ -1,4 +1,9 @@
-{% load static %}{% block content2 %}
+{% load static %}
+
+{% block content2 %}
+<div class="sudoku-title text-center">
+    <h1>{{difficulty| title}} Sudoku</h1>
+</div>
 <link rel="stylesheet" href="{% static 'sudoku/css/sudoku.css' %}" />
 <div class="d-flex align-center justify-content-evenly mt-4">
 
@@ -7,21 +12,31 @@
         <br>
         <button class="btn btn-light" id="valueunlock" ><i class="fa-solid fa-unlock"></i> Unlock Cells</button>
         <br>
-        <button class="btn btn-success border-dark" style="margin-top:auto; margin-bottom: 0; color:black;" id="submit" ><i class="fa-solid fa-check"></i> Submit!</button>
+        <button class="btn btn-primary" value="{{game_id}}" style="margin-top:auto; margin-bottom: 2rem; color:black;" id="save" ><i class="fa-solid fa-save"></i> Save Game</button>
+        <button class="btn btn-success border-dark" style=" margin-bottom: 0; color:black;" id="submit" ><i class="fa-solid fa-check"></i> Submit!</button>
     </div>
+    {% if new_game%}
     {{ puzzle_board|json_script:"puzzleBoardData" }}
+    {% else %}
+    {{ current_state|json_script:"puzzleBoardData" }}
+    {% endif %}
     <div class="sudoku-board" id="sudokuBoard"></div>
+
 </div>
-<div>
-    <input
-        name=""
-        id=""
-        class="btn btn-primary"
-        type="button"
-        value="Button"
-    />
-    
-</div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="saveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        
+        <strong class="me-auto">System</strong>
+        <small>Just Now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        Game saved succesfully!
+      </div>
+    </div>
+  </div>
             
 {% endblock content2 %}
             

@@ -4,6 +4,8 @@ from . import views
 urlpatterns = [
     path('', views.sudoku, name='sudoku'),
     path('puzzle_init', views.puzzle_init, name="puzzle_init"),
+    path('load_game', views.load_game, name="load_game"),
+    path('save_game', views.save_game, name="save_game"),
     path('generate_puzzle', views.generate_puzzle, name="generate_puzzle"),
     path('submit_solution', views.submit_solution, name='submit_solution'),
     # path('solve/', views.solve, name='solve'),

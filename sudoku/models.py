@@ -14,4 +14,4 @@ class Sudoku(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.difficulty.title} Sudoku on {self.created_at.strftime("%d-%b-%Y")}'
+        return f'{self.difficulty} Sudoku on {self.created_at.strftime("%d-%b-%Y")}'

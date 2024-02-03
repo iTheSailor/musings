@@ -1,9 +1,19 @@
-#startButton:{
+:root{
+    --color_primary: #687864;
+    --color_secondary:#31708E;
+    --color_tertiary: #5085A5;
+    --color_quaternary: #8FC1E3;
+    --color_quinary:#F7F9FB;
+
+}
+.starterButtons{
+    background-color: var(--color_quaternary);
     transition: .5s;
 }
 #startButton:hover {
     background-color: #4b9a46;
     color: #fff;
+
 }
 .sudoku-board {
     display: grid;

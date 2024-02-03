@@ -1,15 +1,54 @@
+:root{
+    --color_primary: #687864;
+    --color_secondary:#31708E;
+    --color_tertiary: #5085A5;
+    --color_quaternary: #8FC1E3;
+    --color_quinary:#F7F9FB;
+
+}
 html, body {
     height: 100%;
     margin: 0;
 }
 
-
+main{
+    background-color:var(--color_quinary);
+    /* width: 90%; */
+    /* margin:auto; */
+    color: black;
+}
 
 body {
     display: flex;
     flex-direction: column;
+    background-color: var(--color_quinary);
 }
 
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color_primary);
+    color: white;
+    padding: 1rem;
+}
+nav a {
+    color: var(--color_quarternary);
+    text-decoration: none;
+}
+
+#collapsibleNavId > ul > li > a {
+    color:var(--color_quarternary);
+}
+
+
+#authTray>a{
+    margin-left:1rem;
+    color:var(--color_quarternary);
+    text-decoration: none;
+    border: var(--color_quaternary) solid 1px;
+
+}
 .content {
     flex: 1;  /* This line will make the content area grow to fill the space */
 }
@@ -18,7 +57,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: top;
-    background-color: rgb(61, 84, 77);
-    color: white;
+    background-color: var(--color_secondary);
+    color:var(--color_quinary);
 }
 
