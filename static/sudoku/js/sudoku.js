@@ -225,6 +225,12 @@ document.addEventListener("loadBoard", function () {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
+        if (data["is_correct"] === true) {
+          toastWin();
+        } else {
+            console.log("incorrect");
+
+        }
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -269,6 +275,13 @@ document.addEventListener("loadBoard", function () {
     var toast = new bootstrap.Toast(saveToast);
     toast.show();
     }
+
+  var winToast = document.getElementById("gameToast");
+  function toastWin() {
+    console.log("toast");
+    var toast = new bootstrap.Toast(winToast);
+    toast.show();
+  }
 
 
 
