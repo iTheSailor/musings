@@ -8,7 +8,7 @@ class Sudoku(models.Model):
     solution = models.TextField()
     current_state = models.TextField()
     difficulty = models.CharField(max_length=10)
-    time = models.IntegerField(null=True, blank=True)
+    time = models.IntegerField(default=0)
     is_finished = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

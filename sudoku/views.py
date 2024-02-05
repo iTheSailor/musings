@@ -43,9 +43,12 @@ def save_game(request):
     data=json.loads(data)
     current_state=data['rows']
     game_id=data['game_id']
+    time=data['time']
+    print(time)
     current_state = [[int(cell) if cell else 0 for cell in row] for row in current_state]
     current_board = Sudoku.objects.get(id=game_id)
     current_board.current_state = json.dumps(current_state)
+    current_board.time = time
     current_board.save()
 
     return JsonResponse({'success': True, 'message': 'Game saved successfully'})
@@ -113,6 +116,7 @@ def generate_puzzle(request):
         'puzzle_board' : puzzle_board,
         'current_state': enhanced_current_state,
         'difficulty': difficulty,
+        'time': 0,  # Set the time to 0 for a new game
         'new_game': True}
     
     
@@ -145,3 +149,22 @@ def submit_solution(request):
         return JsonResponse({'success': True, 'is_correct': is_correct})
     except Exception as e:
         return JsonResponse({'success': False, 'message': str(e)})
+    
+    
+@csrf_exempt
+def update_game_duration(request):
+    user = request.user
+    if not user.is_authenticated:
+        return JsonResponse({'success': False, 'message': 'User not authenticated'}, status=403)
+
+    data = json.loads(request.body)
+    game_id = data.get('game_id')
+    duration = data.get('duration')
+
+    try:
+        game = Sudoku.objects.get(id=game_id, player=user)
+        game.time = duration
+        game.save()
+        return JsonResponse({'success': True, 'message': 'Duration updated successfully'})
+    except Sudoku.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Game not found'}, status=404)

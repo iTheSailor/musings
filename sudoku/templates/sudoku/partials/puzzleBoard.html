@@ -1,10 +1,21 @@
 {% load static %}
 
 {% block content2 %}
+<link rel="stylesheet" href="{% static 'sudoku/css/sudoku.css' %}" />
 <div class="sudoku-title text-center">
     <h1>{{difficulty| title}} Sudoku</h1>
 </div>
-<link rel="stylesheet" href="{% static 'sudoku/css/sudoku.css' %}" />
+<div class="text-center w-50 d-flex justify-space-between m-auto">
+  <p class="col-4">Current Time:
+    <span id="initialTimer" style="display: none;">{{time}}</span>
+    <p id="timer"></p>
+  </p>
+  
+  <div class="col-4" style="margin-left:auto">
+
+    <button class="btn btn-danger" id="pause" style="margin-left: 1rem;"><i class="fa-solid fa-pause"></i> Pause</button>
+  </div>
+</div>
 <div class="d-flex align-center justify-content-evenly mt-4">
 
     <div class="toolbelt d-flex flex-column">
@@ -17,9 +28,16 @@
     </div>
     
     {{ current_state|json_script:"puzzleBoardData" }}
-   
-    <div class="sudoku-board" id="sudokuBoard"></div>
+   <div class="sudoku-container" style="position:relative">
 
+     <div class="sudoku-board" id="sudokuBoard" ></div>
+     <div class="board-overlay" id="boardOverlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,1); z-index: 10;">
+      <!-- Overlay content (e.g., "Paused") goes here -->
+      
+      <p style="color: white; text-align: center; top: 50%; position: relative;">Paused</p>
+    </div>
+  </div>
+    
 </div>
 
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">

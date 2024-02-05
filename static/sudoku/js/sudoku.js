@@ -84,6 +84,71 @@ document.addEventListener("loadBoard", function () {
     inputlisteners(); // Ensure this function is correctly handling events for dynamically created elements
   }
 
+  let gameDuration = document.getElementById("initialTimer").innerHTML;
+  console.log(gameDuration);
+  let timer
+
+  function startTimer() {
+    timer = setInterval(function () {
+      gameDuration++;
+      document.getElementById("timer").innerHTML = formatTime(gameDuration);
+      if (gameDuration % 10 === 0) {
+        saveGameDuration();
+      }
+    }, 1000);
+  }
+
+  const pauseButton = document.getElementById("pause");
+  pauseButton.addEventListener("click", function () {
+    console.log("pause clicked");
+    if (pauseButton.innerHTML === '<i class="fa-solid fa-pause"></i> Pause') {
+      pauseButton.innerHTML = '<i class="fa-solid fa-play"></i> Resume';
+      stopTimer();
+      document.getElementById('boardOverlay').style.display = 'block';
+    } else {
+      pauseButton.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+      startTimer();
+      document.getElementById('boardOverlay').style.display = 'none';
+    }
+  });
+  function stopTimer() {
+    clearInterval(timer);
+    saveGameDuration();
+  }
+
+  function formatTime(seconds){
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    if (hours === 0) {
+      return `${minutes < 10 ? '0' : ''}${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    }
+    return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  }
+
+  csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  function saveGameDuration() {
+    const gameId = saveButton.value;
+    fetch('update_game_duration', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken, // Make sure you have the CSRF token
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            game_id: gameId,
+            duration: gameDuration,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
+  }
+
+  window.addEventListener('beforeunload', function(event) {
+    saveGameDuration();  // Make sure this is a synchronous call or use navigator.sendBeacon for async
+  });
+
   // function initializeSudoku() {
   //     const puzzleData = JSON.parse(document.getElementById('puzzleBoardData').textContent)
   //     const board = document.getElementById('sudokuBoard');
@@ -242,6 +307,7 @@ document.addEventListener("loadBoard", function () {
     var sudoku_state = {};
     var input_list = document.getElementsByClassName("sudoku-input");
     var sudoku_rows = [];
+    
     for (let i = 0; i < 9; i++) {
       row = Array.from(input_list)
         .slice(i * 9, i * 9 + 9)
@@ -250,6 +316,7 @@ document.addEventListener("loadBoard", function () {
     }
     sudoku_state["rows"] = sudoku_rows;
     sudoku_state["game_id"] = saveButton.value;
+    sudoku_state["time"] = gameDuration;
     console.log(sudoku_state);
     fetch("/sudoku/save_game", {
       method: "POST",
@@ -285,7 +352,10 @@ document.addEventListener("loadBoard", function () {
 
 
 
+
+
   initializeSudoku();
+  startTimer();
 });
 
 // function checkSubmission(){
