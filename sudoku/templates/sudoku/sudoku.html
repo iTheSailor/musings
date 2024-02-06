@@ -1,128 +1,182 @@
-{% extends 'main/index.html' %} 
-{% load static %} {% block content %}
-    
-    <link rel="stylesheet" href="{% static 'sudoku/css/sudoku.css' %}" />
+{% extends 'main/index.html' %} {% load static %} {% block content %}
 
- 
-    
-    
-    {% block content2 %}
-    <div id="preset">
-    <div class="container">
-        <div class="row">
-            <div class="col">
-            <div class="sudoku-title text-center">
-                <h1>Sudoku</h1>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <div class="d-flex align-center justify-content-evenly mt-4 container-fluid">
-                        <div class="d-flex flex-column ">
-                            <button type="button" class="btn  mt-auto mb-2 starterButtons" data-bs-toggle="modal" data-bs-target="#puzzleInit"
-                            id="startButton">
-                            Start a Puzzle
-                        </button>
-                    
-                        {% if existing_games|length > 0 %}
-                        <button type="button" class="btn mb-auto starterButtons" data-bs-toggle="modal" data-bs-target="#puzzleCont"
-                            id="continueButton">
-                            Continue a Puzzle
-                        </button>
-                        {% else %}
-                        <button class="disabled btn-light btn mb-auto" >
-                            Continue
-                        </button>
-                        {% endif %}
-                    </div>
-                    <div class="sudoku-board" id="sudokuBoardDummy"></div>
-                    
-                    
-                    
-                </div>
-            </div>
-            <script src="{% static 'sudoku/js/sudoku.js' %}" defer></script>
-            
+<link rel="stylesheet" href="{% static 'sudoku/css/sudoku.css' %}" />
+
+{% block content2 %}
+<div id="preset">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="sudoku-title text-center">
+          <h1>Sudoku</h1>
         </div>
+        <div class="row">
+          <div class="col">
+            <div
+              class="d-flex align-center justify-content-evenly mt-4 container-fluid"
+            >
+              <div class="d-flex flex-column">
+                <button
+                  type="button"
+                  class="btn mt-auto mb-2 starterButtons"
+                  data-bs-toggle="modal"
+                  data-bs-target="#puzzleInit"
+                  id="startButton"
+                >
+                  Start a Puzzle
+                </button>
+
+                {% if existing_games|length > 0 %}
+                <button
+                  type="button"
+                  class="btn mb-auto starterButtons"
+                  data-bs-toggle="modal"
+                  data-bs-target="#puzzleCont"
+                  id="continueButton"
+                >
+                  Continue a Puzzle
+                </button>
+                {% else %}
+                <button class="disabled btn-light btn mb-auto">Continue</button>
+                {% endif %}
+              </div>
+              <div class="sudoku-board" id="sudokuBoardDummy"></div>
+            </div>
+          </div>
+          <script src="{% static 'sudoku/js/sudoku.js' %}" defer></script>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-</div>
+
+<div class="container">
+
+    <div class="row">
+      <div class="col">
+        <h3 class="text-center">Wins</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>&nbsp;</th>
+              <th>Easy</th>
+              <th>Medium</th>
+              <th>Hard</th>
+            </tr>
+    
+            <tr>
+              <th>Wins</th>
+              <td>{{easy_wins}}</td>
+              <td>{{medium_wins}}</td>
+              <td>{{hard_wins}}</td>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
 </div>
 
 {% endblock content2 %}
-    
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="puzzleInit"
+  tabindex="-1"
+  aria-labelledby="puzzleInitLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Start a Puzzle</h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form hx-post="{{request.path}}puzzle_init" class="modal-content">
+          <div class="form-control form-group">
+            <label for="difficulty">Select Difficulty:</label>
+            <br />
+            <select id="difficulty" name="difficulty">
+              <option value="test">test</option>
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </div>
+          <button
+            type="button"
+            class="btn btn-success"
+            data-bs-dismiss="modal"
+            hx-target="#preset"
+            hx-swap-oob="outerHTML"
+            hx-post="{% url 'generate_puzzle' %}"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">Start</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
-  
-  <!-- Modal -->
-  <div class="modal fade" id="puzzleInit" tabindex="-1" aria-labelledby="puzzleInitLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    Start a Puzzle
-                </h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-            </div>
-            <div class="modal-body">
-                    <form hx-post="{{request.path}}puzzle_init" class="modal-content">
-                        <div class="form-control form-group">
-
-                            <label for="difficulty">Select Difficulty:</label>
-                            <br>
-                                <select id="difficulty" name="difficulty" >
-                                    <option value="test">test</option>
-                                    <option value="easy">Easy</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="hard">Hard</option>
-                                </select>
-                        </div>
-                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" hx-target="#preset" hx-swap-oob="outerHTML" hx-post="{% url 'generate_puzzle' %}" aria-label="Close" >
-                        <span aria-hidden="true" >Start</span>
-                      </button>  
-                     
-                    </form>
-                    </div>
-                </div>
+<div
+  class="modal fade"
+  id="puzzleCont"
+  tabindex="-1"
+  aria-labelledby="puzzleContLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Continue a Puzzle</h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form hx-post="{{request.path}}load_game" class="modal-content">
+          {% csrf_token %}
+          <div class="form-control form-group">
+            <label for="game">Select Game:</label>
+            <br />
+            <select id="game" name="game">
+              {% for game in existing_games %}
+              <option value="{{game.game_id}}">
+                {{game.difficulty}} Game from {{game.created_at}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <button
+            type="button"
+            class="btn btn-success"
+            data-bs-dismiss="modal"
+            hx-target="#preset"
+            hx-swap-oob="outerHTML"
+            hx-post="{% url 'load_game' %}"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">Continue</span>
+          </button>
+        </form>
+      </div>
     </div>
   </div>
-
-  <div class="modal fade" id="puzzleCont" tabindex="-1" aria-labelledby="puzzleContLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    Continue a Puzzle
-                </h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-            </div>
-            <div class="modal-body">
-                    <form hx-post="{{request.path}}load_game" class="modal-content">
-                        {% csrf_token %}
-                        <div class="form-control form-group">
-
-                            <label for="game">Select Game:</label>
-                            <br>
-                                <select id="game" name="game" >
-                                    {% for game in existing_games %}
-                                    <option value="{{game.game_id}}">{{game.difficulty}} Game from {{game.created_at}}</option>
-                                    {% endfor %}
-                                </select>
-                        </div>
-                        <button type="button" class="btn btn-success" data-bs-dismiss="modal" hx-target="#preset" hx-swap-oob="outerHTML" hx-post="{% url 'load_game' %}" aria-label="Close" >
-                        <span aria-hidden="true" >Continue</span>
-                      </button>  
-                     
-                    </form>
-                    </div>
-                </div>
-    </div>
-  </div>
-
-
+</div>
 
 {% endblock %}
-

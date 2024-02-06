@@ -1,0 +1,59 @@
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'sudoku/css/sudoku.css' %}" />
+
+<div id="finishedBoard">
+
+    <div class="sudoku-title text-center m-auto " >
+        <h1>{{difficulty| title}} Sudoku</h1>
+    </div>
+    <div class="text-center m-auto">
+      <h3>Game Lost</h3>
+    </div>
+    <div class="text-center w-50 d-flex justify-space-between m-auto" style="display: none !important;">
+      <p class="col-4">Current Time:
+        <span id="initialTimer" style="display: none;">0</span>
+        <p id="timer"></p>
+      </p>
+      
+      <div class="col-4" style="margin-left:auto">
+    
+        <button class="btn btn-danger" id="pause" style="margin-left: 1rem;"><i class="fa-solid fa-pause"></i> Pause</button>
+      </div>
+    </div>
+    <div class="d-flex align-center justify-content-evenly mt-4" style="display: none !important;">
+      
+        <div class="toolbelt d-flex flex-column">
+            <button class="btn starterButtons" style="margin-top:1rem;" id="valuelock" ><i class="fa-solid fa-lock"></i> Lock Cells</button>
+            <br>
+            <button class="btn starterButtons" id="valueunlock" ><i class="fa-solid fa-unlock"></i> Unlock Cells</button>
+            <br>
+            <button class="btn btn-primary" value="{{game_id}}" style="margin-top:auto; margin-bottom: 2rem; color:black;" id="save" ><i class="fa-solid fa-save"></i> Save Game</button>
+            <br>
+            <button class="btn btn-danger" id="giveUp" hx-target="#realboard"  hx-swap="innerHTML" hx-get="{% url 'give_up' game_id %}"> Give Up</button>
+            <br>
+            <button class="btn btn-success border-dark" style=" margin-bottom: 0; color:black;" id="submit" value="{{game_id}}" ><i class="fa-solid fa-check"></i> Submit!</button>
+        </div>
+    </div>
+    <div class="d-flex align-center justify-content-evenly mt-4">
+    
+        <div class="d-flex flex-column ">
+            <a href="{% url 'sudoku' %}" type="button" class="btn  mt-auto mb-2 starterButtons" style="cursor:pointer;">Go Back</a>
+            
+        
+    </div>
+        
+        {{ current_state|json_script:"puzzleBoardData" }}
+       <div class="sudoku-container" style="position:relative">
+    
+         <div class="sudoku-board" id="sudokuBoard" ></div>
+        
+      </div>
+        
+    </div>
+</div>
+
+
+            
+{% endblock %}

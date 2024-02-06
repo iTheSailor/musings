@@ -78,7 +78,7 @@ def generate_puzzle(difficulty):
 
     clues = int()   
     if difficulty == 'test':
-        clues = 75
+        clues = 80
     if difficulty == 'easy':
         clues = 30  
     if difficulty == 'medium':

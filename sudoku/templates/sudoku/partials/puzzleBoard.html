@@ -2,71 +2,77 @@
 
 {% block content2 %}
 <link rel="stylesheet" href="{% static 'sudoku/css/sudoku.css' %}" />
-<div class="sudoku-title text-center">
-    <h1>{{difficulty| title}} Sudoku</h1>
-</div>
-<div class="text-center w-50 d-flex justify-space-between m-auto">
-  <p class="col-4">Current Time:
-    <span id="initialTimer" style="display: none;">{{time}}</span>
-    <p id="timer"></p>
-  </p>
+<div id="realboard">
+
+  <div class="sudoku-title text-center">
+      <h1>{{difficulty| title}} Sudoku</h1>
+  </div>
+  <div class="text-center w-50 d-flex justify-space-between m-auto">
+    <p class="col-4">Current Time:
+      <span id="initialTimer" style="display: none;">{{time}}</span>
+      <p id="timer"></p>
+    </p>
+    
+    <div class="col-4" style="margin-left:auto">
   
-  <div class="col-4" style="margin-left:auto">
-
-    <button class="btn btn-danger" id="pause" style="margin-left: 1rem;"><i class="fa-solid fa-pause"></i> Pause</button>
-  </div>
-</div>
-<div class="d-flex align-center justify-content-evenly mt-4">
-
-    <div class="toolbelt d-flex flex-column">
-        <button class="btn starterButtons" style="margin-top:1rem;" id="valuelock" ><i class="fa-solid fa-lock"></i> Lock Cells</button>
-        <br>
-        <button class="btn starterButtons" id="valueunlock" ><i class="fa-solid fa-unlock"></i> Unlock Cells</button>
-        <br>
-        <button class="btn btn-primary" value="{{game_id}}" style="margin-top:auto; margin-bottom: 2rem; color:black;" id="save" ><i class="fa-solid fa-save"></i> Save Game</button>
-        <button class="btn btn-success border-dark" style=" margin-bottom: 0; color:black;" id="submit" ><i class="fa-solid fa-check"></i> Submit!</button>
+      <button class="btn btn-danger" id="pause" style="margin-left: 1rem;"><i class="fa-solid fa-pause"></i> Pause</button>
     </div>
-    
-    {{ current_state|json_script:"puzzleBoardData" }}
-   <div class="sudoku-container" style="position:relative">
-
-     <div class="sudoku-board" id="sudokuBoard" ></div>
-     <div class="board-overlay" id="boardOverlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,1); z-index: 10;">
-      <!-- Overlay content (e.g., "Paused") goes here -->
+  </div>
+  <div class="d-flex align-center justify-content-evenly mt-4">
+  
+      <div class="toolbelt d-flex flex-column">
+          <button class="btn starterButtons" style="margin-top:1rem;" id="valuelock" ><i class="fa-solid fa-lock"></i> Lock Cells</button>
+          <br>
+          <button class="btn starterButtons" id="valueunlock" ><i class="fa-solid fa-unlock"></i> Unlock Cells</button>
+          <br>
+          <button class="btn btn-primary" value="{{game_id}}" style="margin-top:auto; margin-bottom: 2rem; color:black;" id="save" ><i class="fa-solid fa-save"></i> Save Game</button>
+          <br>
+          <button class="btn btn-danger" id="giveUp" hx-target="#realboard"  hx-swap="innerHTML" hx-get="{% url 'give_up' game_id %}"> Give Up</button>
+          <br>
+          <button class="btn btn-success border-dark" style=" margin-bottom: 0; color:black;" id="submit" value="{{game_id}}" ><i class="fa-solid fa-check"></i> Submit!</button>
+      </div>
       
-      <p style="color: white; text-align: center; top: 50%; position: relative;">Paused</p>
+      {{ current_state|json_script:"puzzleBoardData" }}
+     <div class="sudoku-container" style="position:relative">
+  
+       <div class="sudoku-board" id="sudokuBoard" ></div>
+       <div class="board-overlay" id="boardOverlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,1); z-index: 10;">
+        <!-- Overlay content (e.g., "Paused") goes here -->
+        
+        <p style="color: white; text-align: center; top: 50%; position: relative;">Paused</p>
+      </div>
     </div>
+      
   </div>
-    
+  
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      <div id="saveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          
+          <strong class="me-auto">System</strong>
+          <small>Just Now</small>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          Game saved succesfully!
+        </div>
+      </div>
+    </div>
+  
+    <div class="position-fixed p-3" style="z-index: 10">
+      <div id="winToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          
+          <strong class="me-auto">System</strong>
+          <small>Just Now</small>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          Solved!
+        </div>
+      </div>
+    </div>
 </div>
-
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-    <div id="saveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header">
-        
-        <strong class="me-auto">System</strong>
-        <small>Just Now</small>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        Game saved succesfully!
-      </div>
-    </div>
-  </div>
-
-  <div class="position-fixed p-3" style="z-index: 11">
-    <div id="winToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header">
-        
-        <strong class="me-auto">System</strong>
-        <small>Just Now</small>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        Solved!
-      </div>
-    </div>
-  </div>
 
             
 {% endblock content2 %}

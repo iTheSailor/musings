@@ -92,7 +92,7 @@ document.addEventListener("loadBoard", function () {
     timer = setInterval(function () {
       gameDuration++;
       document.getElementById("timer").innerHTML = formatTime(gameDuration);
-      if (gameDuration % 10 === 0) {
+      if (gameDuration % 2 === 0) {
         saveGameDuration();
       }
     }, 1000);
@@ -279,6 +279,7 @@ document.addEventListener("loadBoard", function () {
       sudoku_rows.push(row);
     }
     sudoku_state["rows"] = sudoku_rows;
+    sudoku_state["game_id"] = submit.value;
     console.log(sudoku_state);
     fetch("/sudoku/submit_solution", {
       method: "POST",
@@ -343,13 +344,36 @@ document.addEventListener("loadBoard", function () {
     toast.show();
     }
 
-  var winToast = document.getElementById("gameToast");
+  var winToast = document.getElementById("winToast");
   function toastWin() {
     console.log("toast");
     var toast = new bootstrap.Toast(winToast);
     toast.show();
   }
 
+  // const giveUp = document.getElementById("giveUp");
+
+  // giveUp.addEventListener("click", function () {
+
+  //   fetch("/sudoku/give_up", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/x-www-form-urlencoded",
+  //       'X-CSRFToken': csrftoken,
+  //     },
+  //     body:
+  //       "game_id=" + giveUp.value
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       console.log(data);
+        
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error:", error);
+        
+  //     });
+  //   });
 
 
 

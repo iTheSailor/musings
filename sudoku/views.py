@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from . import sudoku_logic
@@ -12,24 +12,32 @@ def sudoku(request):
     existing_game = Sudoku.objects.filter(player=request.user.id)
     existing_games = []
     for game in existing_game:
-        request.session['sudoku_solution'] = game.solution
-        puzzle_board = json.loads(game.puzzle)
-        current_state = json.loads(game.current_state)
-        time = game.time
+        if game.is_finished != True:
+            request.session['sudoku_solution'] = game.solution
+            puzzle_board = json.loads(game.puzzle)
+            current_state = json.loads(game.current_state)
+            time = game.time
 
-        difficulty = game.difficulty
-        is_finished = game.is_finished
-        existing_games.append({
-            'game_id': game.id,
-            'puzzle_board': puzzle_board,
-            'current_state': current_state,
-            'time': time,
-            'difficulty': difficulty,
-            'is_finished': is_finished,
-            'created_at': game.created_at.strftime('%d-%b %H:%M'),
-        })
+            difficulty = game.difficulty
+            is_finished = game.is_finished
+            existing_games.append({
+                'game_id': game.id,
+                'puzzle_board': puzzle_board,
+                'current_state': current_state,
+                'time': time,
+                'difficulty': difficulty,
+                'is_finished': is_finished,
+                'created_at': game.created_at.strftime('%d-%b %H:%M'),
+            })
+    
+    easy_wins = Sudoku.objects.filter(player=request.user.id, difficulty='easy', win=True).count()
+    medium_wins = Sudoku.objects.filter(player=request.user.id, difficulty='medium', win=True).count()
+    hard_wins = Sudoku.objects.filter(player=request.user.id, difficulty='hard', win=True).count()
     context = {
-        'existing_games': existing_games
+        'existing_games': existing_games,
+        'easy_wins': easy_wins,
+        'medium_wins': medium_wins,
+        'hard_wins': hard_wins,
     }
 
     return render(request, 'sudoku/sudoku.html', context)
@@ -63,6 +71,8 @@ def load_game(request):
     current_state = json.loads(game.current_state)
     time = game.time
     difficulty = game.difficulty
+    solution = json.loads(game.solution)
+    request.session['sudoku_solution'] = solution
 
     # Enhance current_state with clue information
     enhanced_current_state = enhance_state_with_clues(puzzle_board, current_state)
@@ -131,20 +141,29 @@ def puzzle_init(request):
 @require_http_methods(["POST"])
 def submit_solution(request):
     try:
-        solution_board = request.session.get('sudoku_solution')
-        # print('solution board')
-        # print(solution_board)
-        player_board = request.POST.get('sudoku_data')
-        # print('player board')
-        player_board = json.loads(player_board)['rows']
-        player_board = [[int(cell) if cell else 0 for cell in row] for row in player_board]
+        user=request.user
+        if not user.is_authenticated:
+            return JsonResponse({'success': False, 'message': 'User not authenticated'})
+        data=request.POST.get('sudoku_data')
+        data=json.loads(data)
+        player_board=data['rows']
+        game_id=data['game_id']
+        solution_board=request.session.get('sudoku_solution')
         # print(player_board)
-
+        player_board = [[int(cell) if cell else 0 for cell in row] for row in player_board]
         if not solution_board or not player_board:
             return JsonResponse({'success': False, 'message': 'Missing data'})
 
         # Compare player_board with solution_board
+        print("Player Board: ", player_board)
+        print("Solution Board: ", solution_board)
+        print("Comparison: ", solution_board == player_board)
         is_correct = solution_board == player_board
+        game = Sudoku.objects.get(id=game_id)
+        if is_correct:
+            game.is_finished = True
+            game.win = True
+            game.save()
 
         return JsonResponse({'success': True, 'is_correct': is_correct})
     except Exception as e:
@@ -168,3 +187,24 @@ def update_game_duration(request):
         return JsonResponse({'success': True, 'message': 'Duration updated successfully'})
     except Sudoku.DoesNotExist:
         return JsonResponse({'success': False, 'message': 'Game not found'}, status=404)
+
+@csrf_exempt
+def give_up(request, id):
+    print(id)
+    game = Sudoku.objects.get(id=id)
+    game.is_finished = True
+    game.save()
+    solution = request.session.get('sudoku_solution')
+    print(solution)
+    _solution = enhance_state_with_clues(solution, solution)
+    print(_solution)
+    difficulty = game.difficulty
+    context = {
+        'game_id': id,
+        'current_state': _solution,
+        'new_game': False,
+        'difficulty': difficulty,
+    }
+    response = render(request, 'sudoku/partials/lostPuzzleBoard.html', context)
+    return trigger_client_event(response, "loadBoard", after="swap")
+    
