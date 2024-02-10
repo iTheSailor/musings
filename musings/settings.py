@@ -50,11 +50,15 @@ INSTALLED_APPS = [
     "template_partials",
     'fontawesomefree',
     'bootstrap5',
+    'widget_tweaks',
+    'retry_requests',
+    
+
+
     'main',
     'weather',
     'todo',
     'sudoku',
-    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
