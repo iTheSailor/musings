@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Sudoku(models.Model):
-    player = models.ForeignKey(User, on_delete=models.CASCADE)
+    player = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     puzzle = models.TextField()
     solution = models.TextField()
     current_state = models.TextField()

@@ -132,16 +132,15 @@ def generate_puzzle(request):
     puzzle_board = boards[0].tolist()
     solution = boards[1].tolist()
     request.session['sudoku_solution'] = solution
-    if request.user.is_authenticated:
-        Sudoku.objects.create(
-            player=request.user,
-            puzzle=json.dumps(puzzle_board),
-            solution=json.dumps(solution),
-            current_state = json.dumps(puzzle_board),
-            difficulty=difficulty
-        )
-    enhanced_current_state = enhance_state_with_clues(puzzle_board, puzzle_board)
+    Sudoku.objects.create(
+        player=request.user if request.user.is_authenticated else None,
+        puzzle=json.dumps(puzzle_board),
+        solution=json.dumps(solution),
+        current_state = json.dumps(puzzle_board),
+        difficulty=difficulty
+    )
     game_id = Sudoku.objects.latest('id').id
+    enhanced_current_state = enhance_state_with_clues(puzzle_board, puzzle_board)
     context = {
         'game_id': game_id,
         'puzzle_board' : puzzle_board,
@@ -178,7 +177,6 @@ def update_game_duration(request):
 
 @csrf_exempt
 def give_up(request, id):
-    print(id)
     game = Sudoku.objects.get(id=id)
     game.is_finished = True
     game.save()
