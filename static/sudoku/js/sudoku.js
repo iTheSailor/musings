@@ -84,8 +84,14 @@ document.addEventListener("loadBoard", function () {
     inputlisteners(); // Ensure this function is correctly handling events for dynamically created elements
   }
 
-  let gameDuration = document.getElementById("initialTimer").innerHTML;
-  console.log(gameDuration);
+  var starterTimeElement = document.getElementById("startertime");
+  var gameDuration;
+  if (starterTimeElement) {
+    gameDuration = parseInt(starterTimeElement.innerHTML, 10);
+  } else {
+    gameDuration = 0; // Default or starting value if the element doesn't exist
+  }
+
   let timer
 
   function startTimer() {
@@ -148,46 +154,6 @@ document.addEventListener("loadBoard", function () {
   window.addEventListener('beforeunload', function(event) {
     saveGameDuration();  // Make sure this is a synchronous call or use navigator.sendBeacon for async
   });
-
-  // function initializeSudoku() {
-  //     const puzzleData = JSON.parse(document.getElementById('puzzleBoardData').textContent)
-  //     const board = document.getElementById('sudokuBoard');
-  //     var cell_count = 0;
-  //     for (let row = 0; row < 9; row++) {
-  //         for (let col = 0; col < 9; col++) {
-  //             const cell = document.createElement('div');
-  //             cell.className = 'sudoku-cell';
-  //             cell.id = 'cell' + cell_count;
-  //             if (col === 2 || col === 5) cell.classList.add('bold-border-right');
-  //             if (row === 2 || row === 5) cell.classList.add('bold-border-bottom');
-
-  //             const input = document.createElement('input');
-  //             input.className = 'sudoku-input';
-  //             input.id = 'input' + cell_count;
-  //             input.type = 'text';
-
-  //             cell.appendChild(input);
-  //             board.appendChild(cell);
-  //             if(puzzleData[row][col] !== 0){
-  //                 input.value = puzzleData[row][col]
-  //                 input.classList.add('concrete')
-  //                 input.disabled = true;
-  //             }
-  //             input.addEventListener('input', function() {
-  //                 if(!this.classList.contains('locked')) {
-  //                 this.value = this.value.replace(/[^1-9]/g, '');
-  //                 if (this.value.length > 1) {
-  //                     this.value = this.value.charAt(this.value.length - 1);
-  //                 }
-  //             }
-  //             });
-  //             cell_count++;
-  //         }
-  //     }
-  //     sudoku_loaded = true;
-  //     console.log('sudoku loaded');
-  //     inputlisteners();
-  // };
 
   function inputlisteners() {
     const inputs = document.getElementsByClassName("sudoku-input");
@@ -267,6 +233,7 @@ document.addEventListener("loadBoard", function () {
   });
 
   const submit = document.getElementById("submit");
+  const difficulty = document.getElementById("difficulty");
 
   submit.addEventListener("click", function () {
     var sudoku_state = {};
@@ -280,6 +247,8 @@ document.addEventListener("loadBoard", function () {
     }
     sudoku_state["rows"] = sudoku_rows;
     sudoku_state["game_id"] = submit.value;
+    sudoku_state["time"] = gameDuration;
+    sudoku_state["difficulty"] = difficulty.innerHTML.split(" ")[0].toLowerCase();
     console.log(sudoku_state);
     fetch("/sudoku/submit_solution", {
       method: "POST",
@@ -287,20 +256,15 @@ document.addEventListener("loadBoard", function () {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: "sudoku_data=" + JSON.stringify(sudoku_state),
+    }).then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      if (data['success'] === true) {
+        toastWin();
+        // redirect to the game won page
+        window.location.href = "/sudoku/won_game";
+      }
     })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        if (data["is_correct"] === true) {
-          toastWin();
-        } else {
-            console.log("incorrect");
-
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
   });
   const saveButton = document.getElementById("save");
   saveButton.addEventListener("click", function () {
@@ -351,32 +315,10 @@ document.addEventListener("loadBoard", function () {
     toast.show();
   }
 
-  // const giveUp = document.getElementById("giveUp");
-
-  // giveUp.addEventListener("click", function () {
-
-  //   fetch("/sudoku/give_up", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/x-www-form-urlencoded",
-  //       'X-CSRFToken': csrftoken,
-  //     },
-  //     body:
-  //       "game_id=" + giveUp.value
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       console.log(data);
-        
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error:", error);
-        
-  //     });
-  //   });
-
-
-
+  var gameWon = document.getElementById("gameWon");
+  if (gameWon) {
+    stopTimer();
+  }
 
   initializeSudoku();
   startTimer();

@@ -3,11 +3,18 @@ import os
 from . import forecast, maps
 import requests
 from datetime import datetime
+from .models import SavedLocation
+from django.http import JsonResponse
 
 # Create your views here.
 
 def weather(request):
-    
+    if request.user.is_authenticated:
+        saved_locations = SavedLocation.objects.filter(user=request.user)
+        context = {
+            'saved_locations': saved_locations
+        }
+        return render(request, 'weather/weather.html', context)
     return render(request, 'weather/weather.html')
 
 def weather_at_location(request):
@@ -31,3 +38,20 @@ def weather_at_location(request):
         'address': address,
     }
     return render(request, 'weather/partials/weather_at_location.html', context)
+
+
+def save_location(request):
+    try:
+        user = request.user
+        search_type = request.GET.get('searchType', 'address')
+        if search_type == 'zip':
+            location = request.GET['zip']
+            lat, long = maps.geocode(location, search_type)
+        else:
+            location = request.GET['address']
+            lat, long = maps.geocode(location, search_type)
+        SavedLocation.objects.create(user=user, location=location, latitude=lat, longitude=long)
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+    
