@@ -1,11 +1,7 @@
-:root{
-    --color_primary: #687864;
-    --color_secondary:#31708E;
-    --color_tertiary: #5085A5;
-    --color_quaternary: #8FC1E3;
-    --color_quinary:#F7F9FB;
-
+body{
+    color: var(--body_text_color);
 }
+
 .starterButtons{
     background-color: var(--color_quaternary);
     transition: .5s;
@@ -13,10 +9,23 @@
 #startButton:hover {
     background-color: #4b9a46;
     color: #fff;
-
 }
+
+th{
+    background-color: var(--color_secondary);
+    color: var(--body_text_color);
+}
+
+td{
+    background-color: var(--color_quinary);
+    color: var(--body_text_color);
+}
+
+
+
 .sudoku-board {
     display: grid;
+    color: var(--body_text_color);
     grid-template-columns: repeat(9, 1fr);
     grid-gap: 2px;
     max-width: 40rem;

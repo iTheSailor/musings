@@ -4,28 +4,12 @@
     class="navbar navbar-expand-md"
 >
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button
-            class="navbar-toggler d-lg-none"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapsibleNavId"
-            aria-controls="collapsibleNavId"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-        >
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <a class="navbar-brand" href="{%url 'index' %}" style="font-size: 1rem;"><strong>.i-Salir</strong></a>
+       
         <div class="collapse navbar-collapse" id="collapsibleNavId">
             <ul class="navbar-nav me-auto mt-2 mt-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#" aria-current="page"
-                        >Home
-                        <span class="visually-hidden">(current)</span></a
-                    >
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
+                    <a class="nav-link" href="#">Information</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a
@@ -52,6 +36,7 @@
                     </div>
                 </li>
             </ul>
+            <input id="colorMode" type="checkbox" data-toggle="toggle" data-onstyle="success" data-onlabel="🌕" data-onvalue="light" data-offlabel="🌑" data-offvalue="dark" data-offstyle="dark" data-style="ios" data-size="sm" >
             
             <!-- login -->
             <div class="d-flex" id="authTray">

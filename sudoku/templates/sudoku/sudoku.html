@@ -49,11 +49,10 @@
     </div>
   </div>
 </div>
-<br>
+
 <div class="container">
 
-    <div class="row">
-      <div class="col">
+     <div class="col">
         <h3 class="text-center">Wins</h3>
         <table class="table">
           <thead>
@@ -73,7 +72,7 @@
           </thead>
         </table>
       </div>
-    </div>
+
 </div>
 
 {% endblock content2 %}
@@ -103,7 +102,7 @@
         <form hx-post="{{request.path}}puzzle_init" class="modal-content">
           <div class="form-control form-group">
             <label for="difficulty">Select Difficulty:</label>
-            <br />
+            
             <select id="difficulty" name="difficulty">
               <option value="test">test</option>
               <option value="easy">Easy</option>
@@ -153,7 +152,7 @@
           {% csrf_token %}
           <div class="form-control form-group">
             <label for="game">Select Game:</label>
-            <br />
+            
             <select id="game" name="game">
               {% for game in existing_games %}
               <option value="{{game.game_id}}">
