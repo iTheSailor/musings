@@ -5,25 +5,33 @@ from retry_requests import retry
 import requests
 from requests.structures import CaseInsensitiveDict
 import os
+import json
 
 cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
 retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
 openmeteo = openmeteo_requests.Client(session = retry_session)
 
 def location(search):
+	print(search)
 	address = search
-	url = f"https://api.geoapify.com/v1/geocode/search?text={address}&apiKey={os.environ['GEOCODE_KEY']}"
+	url = f"https://api.geoapify.com/v1/geocode/search?text={address}&limit=1&format=json&apiKey={os.environ['GEOCODE_KEY']}"
+	print(url)
 	headers = CaseInsensitiveDict()
 	headers["Accept"] = "application/json"
 	resp = requests.get(url, headers=headers)
 	print(resp.status_code)
 	data = resp.json()
-	lat = data["features"][0]["properties"]["lat"]
-	lon = data["features"][0]["properties"]["lon"]
-	address = data["features"][0]["properties"]["formatted"]
+	result = data['results'][0]  # Access the first result
+
+	lon = result['lon']
+	lat = result['lat']
+	_address = result['formatted']
+
 	location = (lat, lon)
+	print(_address)
+	print(location)
 	weather = forecast(location)
-	data = {"address": address, "weather": weather}
+	data = {"address": _address, "weather": weather}
 	return data
 
 
@@ -55,7 +63,6 @@ def forecast(search):
 	)}
 	hourly_data["is_day"] = hourly_is_day
 	hourly_dataframe = pd.DataFrame(data = hourly_data)
-	print(hourly_dataframe)
 	daily = response.Daily()
 	daily_weather_code = daily.Variables(0).ValuesAsNumpy()
 	daily_temperature_2m_max = daily.Variables(1).ValuesAsNumpy()
@@ -89,7 +96,6 @@ def forecast(search):
 	daily_dataframe = pd.DataFrame(data = daily_data)
 	daily_string = daily_dataframe.to_string()
 	hourly_string = hourly_dataframe.to_string()
-	print(daily_string, hourly_string)
 
 	# print(daily_dataframe, hourly_dataframe)
 

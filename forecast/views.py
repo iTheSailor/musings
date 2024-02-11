@@ -11,6 +11,7 @@ def weather(request):
     data = forecast.location(location)
     weather = data['weather']
     address = data['address']
+    print(address)
     context = {'weather': weather, 'address': address}
     return render(request, 'forecast/weather.html', context)
 
