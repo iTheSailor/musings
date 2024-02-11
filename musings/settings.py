@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'fontawesomefree',
     'bootstrap5',
     'widget_tweaks',
-    'retry_requests',
     
 
 
@@ -59,6 +58,7 @@ INSTALLED_APPS = [
     'weather',
     'todo',
     'sudoku',
+    'forecast',
 ]
 
 MIDDLEWARE = [

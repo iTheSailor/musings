@@ -1,24 +1,45 @@
 import openmeteo_requests
-
 import requests_cache
 import pandas as pd
 from retry_requests import retry
+import requests
+from requests.structures import CaseInsensitiveDict
+import os
 
-# Setup the Open-Meteo API client with cache and retry on error
 cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
 retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
 openmeteo = openmeteo_requests.Client(session = retry_session)
-location=(48.8566, 2.3522)
 
-def forecast(location):
-	lattitude=location[0]
-	longitude=location[1]
+def location(search):
+	address = search
+	url = f"https://api.geoapify.com/v1/geocode/search?text={address}&apiKey={os.environ['GEOCODE_KEY']}"
+	headers = CaseInsensitiveDict()
+	headers["Accept"] = "application/json"
+	resp = requests.get(url, headers=headers)
+	print(resp.status_code)
+	data = resp.json()
+	lat = data["features"][0]["properties"]["lat"]
+	lon = data["features"][0]["properties"]["lon"]
+	address = data["features"][0]["properties"]["formatted"]
+	location = (lat, lon)
+	weather = forecast(location)
+	data = {"address": address, "weather": weather}
+	return data
+
+
+def forecast(search):
+	lattitude = search[0]
+	longitude = search[1]
 	params={
 		"latitude": lattitude,
 		"longitude": longitude,
 		"hourly": "is_day",
 		"daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "sunrise", "sunset", "precipitation_sum", "precipitation_hours", "precipitation_probability_max"],
-		"forecast_hours": 6
+		"forecast_hours": 6,
+		"temperature_unit": "fahrenheit",
+		"wind_speed_unit": "mph",
+		"precipitation_unit": "inch",
+		"timezone": "auto"
 	}
 	url = "https://api.open-meteo.com/v1/forecast"	
 	responses = openmeteo.weather_api(url, params=params)
@@ -73,5 +94,3 @@ def forecast(location):
 	# print(daily_dataframe, hourly_dataframe)
 
 	return daily_string, hourly_string
-
-forecast(location)

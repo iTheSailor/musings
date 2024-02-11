@@ -11,4 +11,5 @@ urlpatterns = [
     path('weather/', include('weather.urls'), name='weather'),
     path('sudoku/', include('sudoku.urls'), name='sudoku'),
     path('todo/', include('todo.urls'), name='todo'),
+    path('forecast/', include('forecast.urls'), name='forecast'),
 ]
