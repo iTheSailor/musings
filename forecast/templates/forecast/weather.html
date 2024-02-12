@@ -9,15 +9,29 @@
             <div class="d-flex">
             <h3 class="m-e-auto">{{address}}</h3>
             <div class="d-flex ms-auto">
-                <a href="{% url 'forecast:index'%}" class="btn btn-md btn-primary">Back</a>
+                <form action="">
+
+                    <a href="{%url 'forecast:index' %}" class="btn btn-md btn-primary">Back</a>
+                </form>
                 {% if user.is_authenticated %}
-                    <form action="{% url 'forecast:addLocation' %}" id="addLocation">
+                    {% if address in user_locations %}
+                        {% with location_id=location_ids|get:address %}
+                        <form action="{% url 'forecast:deleteLocation' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="location_id" value="{{ location_id }}">
+                            <button type="submit">Remove</button>
+                        </form>
+                    {% endwith %}
+                    {% else %}                  
+                    <form hx-get="{% url 'forecast:addLocation' %}" id="addLocation" >
+                        {% csrf_token %}
                         <input type="hidden" name="address" value="{{address}}">
                         <input type="hidden" name="lat" value="{{geodata.lat}}">
                         <input type="hidden" name="lon" value="{{geodata.lon}}">
-                        <input type="submit" value="Add Location" class="btn btn-primary">
+                        <input type="submit" value="Submit"   class="btn btn-md btn-primary">
                     </form>
-                    {% endif %}
+                {% endif %}
+                {% endif %}
                 </div>
             </div>
             {% for day in weather %}
