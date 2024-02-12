@@ -76,7 +76,7 @@ ROOT_URLCONF = 'musings.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'DIRS': [os.path.join(BASE_DIR,'jinja2')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -72,6 +72,16 @@ nav a {
     align-items: top;
     background-color: var(--color_secondary);
     color:var(--footer_text_color);
+    /* margin-top: 2rem; */
+}
+.footerr{
+    height: 6.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: top;
+    background-color: var(--color_secondary);
+    color:var(--footer_text_color);
+    /* margin-top: 2rem; */ 
 }
 
 .toggle.ios,

@@ -94,9 +94,11 @@ def forecast(search):
 
 
 	daily_dataframe = pd.DataFrame(data = daily_data)
-	daily_string = daily_dataframe.to_string()
-	hourly_string = hourly_dataframe.to_string()
+	daily_string = daily_dataframe
+	hourly_string = hourly_dataframe
+	daily_dict = daily_dataframe.to_dict()
+	hourly_dict = hourly_dataframe.to_dict()
 
 	# print(daily_dataframe, hourly_dataframe)
 
-	return daily_string, hourly_string
+	return daily_dict

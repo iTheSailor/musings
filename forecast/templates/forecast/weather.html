@@ -5,7 +5,30 @@
     <div class="row">
         <div class="col">
             <h3>{{address}}</h3>
-            
+            <!-- <span>{{weather}}</span> -->
+            {% for day in weather %}
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{day.date}}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <p>filler</p>
+                        </div>
+                        <div class="col">
+                            <p>Weather Code: {{ day.weather_code }}</p>
+                            <p>Max Temp: {{ day.temperature_2m_max }}°F</p>
+                            <p>Min Temp: {{ day.temperature_2m_min }}°F</p>
+                            <p>Max Apparent Temp: {{ day.apparent_temperature_max }}°F</p>
+                            <p>Min Apparent Temp: {{ day.apparent_temperature_min }}°F</p>
+                            <p>Precipitation Sum: {{ day.precipitation_sum }} inches</p>
+                            <p>Precipitation Hours: {{ day.precipitation_hours }}</p>
+                            <p>Precipitation Probability Max: {{ day.precipitation_probability_max }}%</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
 
         </div>
     </div>
