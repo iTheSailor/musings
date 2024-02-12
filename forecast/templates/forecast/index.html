@@ -7,18 +7,38 @@
             <h2 class="text-center">Weather Forecast</h2>
             <form action="{% url 'forecast:weather' %}" class="m-auto">
                 <div class="searchBar">
-                    <input type="text" id="location" name="location" placeholder="Enter Address">
+                    <input type="text" id="address" name="address" placeholder="Enter Address">
                     <input type="submit" value="Search">
                 </div>
             </form>
         </div>
     </div>
-
     <div class="row">
         <div class="col">
-            {% block content2 %}{% endblock %}
+            {% block content2 %}
+            {% for location in locations %}
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{location.address}}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <p>Latitude: {{location.lat}}</p>
+                            <p>Longitude: {{location.lon}}</p>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'forecast:weather' %}?address={{location.address}}">View Weather</a>
+                            <a href="{% url 'forecast:deleteLocation' %}?location_id={{location.id}}">Delete Location</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endblock %}
         </div>
     </div>
 </div>
+<script src="{% static 'forecast/js/forecast.js' %}" defer></script>
 
 {% endblock %}

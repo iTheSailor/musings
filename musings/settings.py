@@ -51,9 +51,6 @@ INSTALLED_APPS = [
     'fontawesomefree',
     'bootstrap5',
     'widget_tweaks',
-    
-
-
     'main',
     'weather',
     'todo',
@@ -76,7 +73,7 @@ ROOT_URLCONF = 'musings.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'jinja2')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

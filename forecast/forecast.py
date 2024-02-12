@@ -26,13 +26,39 @@ def location(search):
 	lon = result['lon']
 	lat = result['lat']
 	_address = result['formatted']
+	geodata= {
+		"lat": lat,
+		"lon": lon
+	}
 
 	location = (lat, lon)
-	print(_address)
-	print(location)
+	supplement = supplemental(location)
+
 	weather = forecast(location)
-	data = {"address": _address, "weather": weather}
+	data = {"address": _address, "weather": weather, "supplement": supplement, "geodata": geodata}
 	return data
+
+def supplemental(search):
+    lat = search[0]
+    long = search[1]
+    get_weather = requests.get(f'https://api.weather.gov/points/{lat},{long}')
+    weather_json = get_weather.json()
+    forecast_url = weather_json['properties']['forecast']
+    forecast = requests.get(forecast_url).json()
+    forecast = forecast['properties']['periods']
+    weather_by_date = {}
+    for period in forecast:
+        date_str = period['startTime'].split('T')[0]
+        if date_str not in weather_by_date:
+            weather_by_date[date_str] = []
+        weather_by_date[date_str].append(period)
+
+    weather_bundle = {
+        'supplement': weather_by_date,
+    }
+
+
+    return weather_bundle
 
 
 def forecast(search):
