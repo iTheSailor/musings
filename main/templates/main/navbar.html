@@ -25,12 +25,11 @@
                         class="dropdown-menu"
                         aria-labelledby="dropdownId"
                     >
-                        <a class="dropdown-item" href="{% url 'weather' %}"
-                            >Weather App</a
-                        >
                         <a class="dropdown-item" href="{% url 'todo' %}"
                             >ToDo List</a
                         >
+                        <a class="dropdown-item" href="{% url 'forecast:index' %}"
+                            >Forecast</a>
                         <a class="dropdown-item" href="{% url 'sudoku' %}"
                             >Sudoku</a>
                     </div>

@@ -1,8 +1,9 @@
 {% extends "forecast/index.html" %}
 {%load static%}
-{% load forecast_extras %}
+{% load tag_extras %}
 
 {% block content %}
+
 <div class="container">
     <div class="row">
         <div class="col">
@@ -10,38 +11,66 @@
             <h3 class="m-e-auto">{{address}}</h3>
             <div class="d-flex ms-auto">
                 <form action="">
-
-                    <a href="{%url 'forecast:index' %}" class="btn btn-md btn-primary">Back</a>
+                    <button class="weatherNavButtons"><a href="{%url 'forecast:index' %}"  style="text-decoration: none;"> Back</a> </button>
                 </form>
                 {% if user.is_authenticated %}
                     {% if address in user_locations %}
                         {% with location_id=location_ids|get:address %}
-                        <form action="{% url 'forecast:deleteLocation' %}" method="post">
+                        <form hx-get="{% url 'forecast:deleteLocationWeatherView' %}" id="removeLocation">
                             {% csrf_token %}
                             <input type="hidden" name="location_id" value="{{ location_id }}">
-                            <button type="submit">Remove</button>
+                            <button type="submit" class="weatherNavButtons">Remove </button>
                         </form>
                     {% endwith %}
                     {% else %}                  
-                    <form hx-get="{% url 'forecast:addLocation' %}" id="addLocation" >
+                    <form hx-get="{% url 'forecast:addLocation' %}" id="addLocation" class="ms-1">
                         {% csrf_token %}
                         <input type="hidden" name="address" value="{{address}}">
                         <input type="hidden" name="lat" value="{{geodata.lat}}">
                         <input type="hidden" name="lon" value="{{geodata.lon}}">
-                        <input type="submit" value="Submit"   class="btn btn-md btn-primary">
+                        <button type="submit" class="weatherNavButtons"> Save Location </button>
                     </form>
                 {% endif %}
                 {% endif %}
                 </div>
             </div>
+            <div class="d-flex justify-content-between">
+
+                <form action="{% url 'forecast:weather' %}">
+                    <input type="text" id="address" name="address" placeholder="Search another location...">
+                    <input type="submit" value="Search">
+                </form>
+                
+                {% if user.is_authenticated %}
+                <form type="" class="nav-item dropdown d-flex">
+                        <h4>My Locations: </h4>
+                        {% if user_locations %}
+                        <button class="dropdown-toggle" id="dropdownId" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Saved Locations
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownId">
+                            {% for address in user_locations %}
+                            <a class="dropdown-item" href="{% url 'forecast:weather' %}?address={{ address|urlencode }}">
+                                {{ nicknames|get:address }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div>
+                            <h4 class="text-secondary">No locations saved.</h4>
+                        </div>
+                        {% endif %}
+                </form>
+                {% endif %}
+            </div>
             {% for day in weather %}
-            <div class="card">
+            <div class="card mb-1">
                 <div class="card-header">
                     <h5>{{day.date | date:"M-d-Y"}}</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col m-auto">
+                    <div class="row" >
+                        <div class="col">
                             {% with day.date|date:"Y-m-d" as formatted_date %}
                                 {% with supplement|get:formatted_date as daily_details %}
                                     {% if daily_details %}
@@ -53,7 +82,7 @@
                                             {% endif %}
                                         {% endfor %}
                                     {% else %}
-                                        <p>No detailed forecast available for this date.</p>
+                                        <p>No detailed forecast available for this date or location. Detailed forecasts are only avaliable for locations within the United States.</p>
                                     {% endif %}
                                 {% endwith %}
                             {% endwith %}
@@ -71,9 +100,11 @@
                         </div>
                     </div>
                 </div>
+            </div>
             {% endfor %}
-
         </div>
     </div>
 </div>
+
+<p>{{nicknames}}</p>
 {% endblock %}

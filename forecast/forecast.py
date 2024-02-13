@@ -12,27 +12,30 @@ retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
 openmeteo = openmeteo_requests.Client(session = retry_session)
 
 def location(search):
-	print(search)
+	# print(search)
 	address = search
 	url = f"https://api.geoapify.com/v1/geocode/search?text={address}&limit=1&format=json&apiKey={os.environ['GEOCODE_KEY']}"
-	print(url)
+	# print(url)
 	headers = CaseInsensitiveDict()
 	headers["Accept"] = "application/json"
 	resp = requests.get(url, headers=headers)
-	print(resp.status_code)
+	# print(resp.status_code)
 	data = resp.json()
 	result = data['results'][0]  # Access the first result
 
 	lon = result['lon']
 	lat = result['lat']
 	_address = result['formatted']
+	country_code = result.get('country_code', '').lower()
 	geodata= {
 		"lat": lat,
 		"lon": lon
 	}
-
+	supplement = None
+	if country_code == "us":
+		location = (lat, lon)
+		supplement = supplemental(location)
 	location = (lat, lon)
-	supplement = supplemental(location)
 
 	weather = forecast(location)
 	data = {"address": _address, "weather": weather, "supplement": supplement, "geodata": geodata}

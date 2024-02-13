@@ -1,0 +1,36 @@
+.weatherNavButtons{
+    margin-left:1rem;
+    color:var(--body_text_color);
+    text-decoration: none;
+    background-color: var(--color_quinary);
+    border: var(--color_quaternary) solid 1px;
+    border-radius: .25rem;
+}
+.weatherNavButtons>a{
+    color:var(--body_text_color);
+    text-decoration: none;
+    background-color: var(--color_quinary);
+}
+.weatherNavButtons:hover{
+    color:var(--color_quaternary);
+    text-decoration: none;
+    background-color: var(--color_tertiary);
+    >a{
+        color:var(--color_quaternary);
+        text-decoration: none;
+        background-color: var(--color_tertiary);
+    }
+}
+.card{
+    padding: 0;
+    margin: 0;
+    background-color: var(--color_secondary);
+}
+.card-header{
+    background-color: var(--color_quaternary);
+    color:var(--body_text_color);
+}
+.card-body{
+    background-color: var(--color_tertiary);
+    color:var(--body_text_color);
+}
