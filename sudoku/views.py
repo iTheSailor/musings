@@ -16,6 +16,7 @@ def sudoku(request):
             'easy_wins': 'Must Be Logged In',
             'medium_wins': 'To Keep Track',
             'hard_wins': 'Of Your Wins',
+            'user': 'AnonymousUser',
             }
             return render(request, 'sudoku/sudoku.html', context)
         user = request.user.id
@@ -48,6 +49,7 @@ def sudoku(request):
             'easy_wins': easy_wins,
             'medium_wins': medium_wins,
             'hard_wins': hard_wins,
+            'user': request.user,
         }
 
         return render(request, 'sudoku/sudoku.html', context)
@@ -194,52 +196,6 @@ def give_up(request, id):
     response = render(request, 'sudoku/partials/lostPuzzleBoard.html', context)
     return trigger_client_event(response, "loadBoard", after="swap")
 
-
-@csrf_exempt
-def submit_solution(request):
-    user = request.user
-    data=request.POST.get('sudoku_data')
-    print(data)
-    print(type(data))
-    data=json.loads(data)
-    print(data)
-    print(type(data))
-    player_board=data.get('rows')
-    game_id=data.get('game_id')
-    solution_board=request.session.get('sudoku_solution')
-    difficulty = data.get('difficulty')
-    time = data.get('time')
-    # print(player_board)
-    player_board = [[int(cell) if cell else 0 for cell in row] for row in player_board]
-    if not solution_board or not player_board:
-        return JsonResponse({'success': False, 'message': 'Missing data'})
-
-    # Compare player_board with solution_board
-    print("Player Board: ", player_board)
-    print("Solution Board: ", solution_board)
-    print("Comparison: ", solution_board == player_board)
-    is_correct = solution_board == player_board
-    _solution = enhance_state_with_clues(solution_board, solution_board)
-    print(is_correct)
-    if is_correct:
-# Assuming you want to perform different actions for authenticated users
-        if user.is_authenticated:
-            game = Sudoku.objects.get(id=game_id)
-            game.is_finished = True
-            game.win = True
-            game.save()
-
-        # Prepare the "won game" screen
-        request.session['context'] = {
-            'game_id': game_id,  # Use game_id, which is defined and fetched correctly
-            'current_state': _solution,  # Assuming _solution is prepared correctly
-            'new_game': False,
-            'difficulty': difficulty,
-            'time': time,
-        }
-        return JsonResponse({'success': True, 'message': 'Correct solution'})
-    else:
-        return JsonResponse({'success': False, 'message': 'Incorrect solution'})
     
 def won_game(request):
     context = request.session.get('context')
@@ -251,5 +207,90 @@ def won_game(request):
     response = render(request, template_name='sudoku/partials/wonPuzzleBoard.html', context=context)
     return trigger_client_event(response, "loadBoard", context, after="receive")
     
-    
-    
+def check_sudoku_board(board):
+    # Check each row
+    for row in board:
+        if not is_valid_group(row):
+            return False
+
+    # Check each column
+    for col in range(9):
+        if not is_valid_group([board[row][col] for row in range(9)]):
+            return False
+
+    # Check each 3x3 square
+    for box_row in range(0, 9, 3):
+        for box_col in range(0, 9, 3):
+            if not is_valid_box(board, box_row, box_col):
+                return False
+
+    # If all checks pass
+    return True
+
+def is_valid_group(group):
+    """Check if a group (row/column) contains unique numbers from 1 to 9."""
+    return sorted(group) == list(range(1, 10))
+
+def is_valid_box(board, start_row, start_col):
+    """Check if a 3x3 box contains unique numbers from 1 to 9."""
+    numbers = []
+    for row in range(3):
+        for col in range(3):
+            numbers.append(board[start_row + row][start_col + col])
+    return is_valid_group(numbers)
+
+@csrf_exempt
+def submit_solution(request):
+    user = request.user
+    data = request.POST.get('sudoku_data')
+    if data is None:
+        return JsonResponse({'success': False, 'message': 'No data provided'})
+
+    data = json.loads(data)
+    player_board = data.get('rows')
+    game_id = data.get('game_id')
+    difficulty = data.get('difficulty')
+    time = data.get('time')
+
+    # Convert player_board to a 2D list of integers
+    try:
+        player_board = [[int(cell) if cell else 0 for cell in row] for row in player_board]
+    except ValueError:
+        # In case of conversion failure, return an error
+        return JsonResponse({'success': False, 'message': 'Invalid board data'})
+
+    if not player_board:
+        return JsonResponse({'success': False, 'message': 'Missing board data'})
+
+    # Use the Sudoku validation function instead of comparing to a solution
+    is_correct = check_sudoku_board(player_board)
+    print(f"Player Board: {player_board}")
+    print(f"Is Correct: {is_correct}")
+
+    if is_correct:
+        # Perform actions for authenticated users
+        if user.is_authenticated:
+            try:
+                game = Sudoku.objects.get(id=game_id)
+                game.is_finished = True
+                game.win = True
+                game.save()
+            except Sudoku.DoesNotExist:
+                # Handle the case where the game does not exist
+                return JsonResponse({'success': False, 'message': 'Game not found'})
+
+        # Assuming enhance_state_with_clues is defined elsewhere and used correctly
+        _solution = enhance_state_with_clues(player_board, player_board)
+
+        # Prepare the response for a correct solution
+        request.session['context'] = {
+            'game_id': game_id,
+            'current_state': _solution,
+            'new_game': False,
+            'difficulty': difficulty,
+            'time': time,
+        }
+        return JsonResponse({'success': True, 'message': 'Correct solution'})
+    else:
+        # Response for an incorrect solution
+        return JsonResponse({'success': False, 'message': 'Incorrect solution'})
