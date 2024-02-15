@@ -3,10 +3,18 @@
 {% extends 'main/index.html' %}
 
 {% block content %}
-    <h1>Register</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Register</button>
-    </form>
+<div class="container">
+    <div class="row">
+        <div class="col d-flex flex-column align-items-center">
+            <h2>Register</h2>
+            <form method="POST" class="d-flex flex-column">
+                <div class="d-flex flex-column align-items-end justify-content-around">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" class="btn btn-primary align-self-stretch">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

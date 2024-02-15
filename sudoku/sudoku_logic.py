@@ -80,11 +80,11 @@ def generate_puzzle(difficulty):
     if difficulty == 'test':
         clues = 80
     if difficulty == 'easy':
-        clues = 30  
+        clues = 40  
     if difficulty == 'medium':
-        clues = 20
+        clues = 30
     if difficulty == 'hard':
-        clues = 10
+        clues = 20
     if solution_board is not None:
         
         boards = remove_numbers_to_create_puzzle(solution_board.tolist(), clues)

@@ -3,10 +3,19 @@
 {% extends 'main/index.html' %}
 
 {% block content %}
-    <h1>Logout</h1>
-    <p>Are you sure you want to logout?</p>
-    <form method="POST">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Logout</button>
-    </form>
+<div class="container">
+    <div class="row">
+        <div class="col d-flex flex-column align-items-center">
+            <h2>Logout</h2>
+            <form method="POST" class="d-flex flex-column">
+                <div class="d-flex flex-column align-items-end justify-content-around">
+                    {% csrf_token %}
+                    <p>Are you sure you want to logout?</p>
+                </div>
+                <button type="submit" class="btn btn-danger align-self-stretch">Logout</button>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
+

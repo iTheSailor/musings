@@ -93,13 +93,15 @@ document.addEventListener("loadBoard", function () {
   }
 
   let timer
-
+  const user = document.getElementById("user").innerHTML;
   function startTimer() {
     timer = setInterval(function () {
       gameDuration++;
       document.getElementById("timer").innerHTML = formatTime(gameDuration);
-      if (gameDuration % 2 === 0) {
-        saveGameDuration();
+      if (user !== "AnonymousUser") {
+        if (gameDuration % 15 === 0) {
+          saveGameDuration();
+        }
       }
     }, 1000);
   }
