@@ -73,7 +73,7 @@ def save_game(request):
     current_state=data['rows']
     game_id=data['game_id']
     time=data['time']
-    print(time)
+    # print(time)
     current_state = [[int(cell) if cell else 0 for cell in row] for row in current_state]
     current_board = Sudoku.objects.get(id=game_id)
     current_board.current_state = json.dumps(current_state)
@@ -107,7 +107,7 @@ def load_game(request):
     }
 
     response = render(request, 'sudoku/partials/puzzleBoard.html', context)
-    print(game_id)
+    # print(game_id)
     return trigger_client_event(response, "loadBoard", after="swap")
 
 def enhance_state_with_clues(puzzle_board, current_state):
@@ -183,9 +183,9 @@ def give_up(request, id):
     game.is_finished = True
     game.save()
     solution = request.session.get('sudoku_solution')
-    print(solution)
+    # print(solution)
     _solution = enhance_state_with_clues(solution, solution)
-    print(_solution)
+    # print(_solution)
     difficulty = game.difficulty
     context = {
         'game_id': id,
@@ -199,7 +199,7 @@ def give_up(request, id):
     
 def won_game(request):
     context = request.session.get('context')
-    print('Context: ', context)
+    # print('Context: ', context)
     if not context:
         return redirect('sudoku')
     
@@ -264,8 +264,8 @@ def submit_solution(request):
 
     # Use the Sudoku validation function instead of comparing to a solution
     is_correct = check_sudoku_board(player_board)
-    print(f"Player Board: {player_board}")
-    print(f"Is Correct: {is_correct}")
+    # print(f"Player Board: {player_board}")
+    # print(f"Is Correct: {is_correct}")
 
     if is_correct:
         # Perform actions for authenticated users
