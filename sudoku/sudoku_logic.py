@@ -88,6 +88,6 @@ def generate_puzzle(difficulty):
     if solution_board is not None:
         
         boards = remove_numbers_to_create_puzzle(solution_board.tolist(), clues)
-        print(f'puzzle board {boards[0]}')
-        print(f'solution board {boards[1]}')
+        # print(f'puzzle board {boards[0]}')
+        # print(f'solution board {boards[1]}')
         return boards
