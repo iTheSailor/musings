@@ -47,6 +47,10 @@ nav a {
     color: var(--color_quarternary);
     text-decoration: none;
 }
+.nav-link{
+    color: var(--color_quarternary);
+    text-decoration: none;
+}
 
 #collapsibleNavId > ul > li > a {
     color:var(--color_quarternary);
@@ -67,15 +71,14 @@ nav a {
 }
 
 .footer {
-    height: 7rem;
     display: flex;
     justify-content: space-between;
     align-items: top;
     background-color: var(--color_secondary);
     color:var(--footer_text_color);
-    bottom:0;
     width:100%;
-    position:sticky;
+    height: auto;
+    padding: .5rem .5rem .5rem .5rem;
     /* margin-top: 2rem; */
 }
 
