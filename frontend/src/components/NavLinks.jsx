@@ -11,13 +11,13 @@ import {
 
 const NavDropdown = () => (
 <>
-    <MenuItem className='link item'>Home</MenuItem>
+    <MenuItem className='link item' href='/'>Home</MenuItem>
     <Dropdown text='Apps' pointing className='link item'>
       <DropdownMenu>
         <DropdownHeader>Apps</DropdownHeader>
-        <DropdownItem>Forecast</DropdownItem>
-        <DropdownItem>Sudoku</DropdownItem>
-        <DropdownItem>To-Do List</DropdownItem>
+        <DropdownItem href='/apps/forecast'>Forecast</DropdownItem>
+        <DropdownItem href='/apps/sudoku'>Sudoku</DropdownItem>
+        <DropdownItem href='/apps/to-do'>To-Do List</DropdownItem>
         <DropdownDivider />
         <DropdownHeader>Docs</DropdownHeader>
         <DropdownItem>Forecast</DropdownItem>
