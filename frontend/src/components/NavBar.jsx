@@ -1,151 +1,144 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Menu, Segment, Button, Container, Icon, Sidebar } from 'semantic-ui-react';
-import { createMedia } from '@artsy/fresnel'
+import { createMedia } from '@artsy/fresnel';
 import PropTypes from 'prop-types';
-import { InView } from 'react-intersection-observer'
-import HomepageHeading from '../components/HomepageHeading.jsx'; // Assuming you've moved this into its own file
-
+import { InView } from 'react-intersection-observer';
+import { useLocation } from 'react-router-dom'; // Import useLocation hook from react-router-dom
+import HomepageHeading from '../components/HomepageHeading.jsx'; // Make sure this path is correct
+import NavDropdown from './NavLinks.jsx'; // Make sure this path is correct
 
 const { MediaContextProvider, Media } = createMedia({
-    breakpoints: {
-      mobile: 0,
-      tablet: 768,
-      computer: 1024,
-    },
-  })
+  breakpoints: {
+    mobile: 0,
+    tablet: 768,
+    computer: 1024,
+  },
+});
 
-class DesktopContainer extends Component {
-    state = {};
+// Convert DesktopContainer to a functional component to use hooks
+const DesktopContainer = ({ children }) => {
+  const [fixed, setFixed] = React.useState(false);
+  const location = useLocation(); // Use useLocation hook to get the current location
+  const isHomepage = location.pathname === '/'; // Check if the pathname is '/'
 
-    toggleFixedMenu = (inView) => this.setState({ fixed: !inView });
+  const toggleFixedMenu = (inView) => setFixed(!inView);
 
-    render() {
-        const { children } = this.props;
-        const { fixed } = this.state;
-
-        return (
-            <Media greaterThan='mobile'>
-                <InView onChange={this.toggleFixedMenu}>
-                <Segment
-                    inverted
-                    textAlign='center'
-                    style={{ minHeight: 700, padding: '1em 0em' }}
-                    vertical
-                >
-                    <Menu
-                        fixed={fixed ? 'top' : null}
-                        inverted={!fixed}
-                        pointing={!fixed}
-                        secondary={!fixed}
-                        size='large'
-                    >
-                        <Container>
-                            <Menu.Item as='a' href="/" active>
-                                Home
-                            </Menu.Item>
-                            <Menu.Item as='a' href="/apps/forecast">Work</Menu.Item>
-                            <Menu.Item as='a'>Company</Menu.Item>
-                            <Menu.Item as='a'>Careers</Menu.Item>
-                            <Menu.Item position='right'>
-                                <Button as='a' inverted={!fixed}>
-                                    Log in
-                                </Button>
-                                <Button as='a' inverted={!fixed} primary={fixed} style={{ marginLeft: '0.5em' }}>
-                                    Sign Up
-                                </Button>
-                            </Menu.Item>
-                        </Container>
-                    </Menu>
-                    <HomepageHeading />
-                </Segment>
-                {children}
-                </InView>
-            </Media>
-        );
-    }
-}
-
-DesktopContainer.propTypes = {
-    children: PropTypes.node,
+  return (
+    <Media greaterThan='mobile'>
+      <InView onChange={toggleFixedMenu}>
+        <Segment
+          inverted
+          textAlign='center'
+          style={{ padding: '1em 0em' }}
+          vertical
+        >
+          <Menu
+            fixed={fixed ? 'top' : null}
+            inverted={!fixed}
+            pointing={!fixed}
+            secondary={!fixed}
+            size='large'
+          >
+            <Container>
+              
+                <NavDropdown />
+              
+              <Menu.Item position='right'>
+                <Button as='a' inverted={!fixed}>
+                  Log in
+                </Button>
+                <Button as='a' inverted={!fixed} primary={fixed} style={{ marginLeft: '0.5em' }}>
+                  Sign Up
+                </Button>
+              </Menu.Item>
+            </Container>
+          </Menu>
+          {isHomepage && <HomepageHeading />}
+        </Segment>
+        {children}
+      </InView>
+    </Media>
+  );
 };
 
-class MobileContainer extends Component {
-    state = {};
+DesktopContainer.propTypes = {
+  children: PropTypes.node,
+};
 
-    handleSidebarHide = () => this.setState({ sidebarOpened: false });
+// Convert MobileContainer to a functional component to use hooks
+const MobileContainer = ({ children }) => {
+  const [sidebarOpened, setSidebarOpened] = React.useState(false);
+  const location = useLocation(); // Use useLocation hook to get the current location
+  const isHomepage = location.pathname === '/'; // Check if the pathname is '/'
 
-    handleToggle = () => this.setState({ sidebarOpened: true });
+  const handleSidebarHide = () => setSidebarOpened(false);
+  const handleToggle = () => setSidebarOpened(true);
 
-    render() {
-        const { children } = this.props;
-        const { sidebarOpened } = this.state;
+  return (
+    <Media as={Sidebar.Pushable} at='mobile'>
+      <Sidebar.Pushable>
+        <Sidebar
+          as={Menu}
+          animation='overlay'
+          inverted
+          onHide={handleSidebarHide}
+          vertical
+          visible={sidebarOpened}
+        >
+          <Menu.Item as='a' active>
+            Home
+          </Menu.Item>
+          <Menu.Item as='a'>Work</Menu.Item>
+          <Menu.Item as='a'>Company</Menu.Item>
+          <Menu.Item as='a'>Careers</Menu.Item>
+          <Menu.Item as='a'>Log in</Menu.Item>
+          <Menu.Item as='a'>Sign Up</Menu.Item>
+        </Sidebar>
 
-        return (
-            <Media as={Sidebar.Pushable} at='mobile'>
-                <Sidebar.Pushable>
-                    <Sidebar
-                        as={Menu}
-                        animation='overlay'
-                        inverted
-                        onHide={this.handleSidebarHide}
-                        vertical
-                        visible={sidebarOpened}
-                    >
-                        <Menu.Item as='a' active>
-                            Home
-                        </Menu.Item>
-                        <Menu.Item as='a'>Work</Menu.Item>
-                        <Menu.Item as='a'>Company</Menu.Item>
-                        <Menu.Item as='a'>Careers</Menu.Item>
-                        <Menu.Item as='a'>Log in</Menu.Item>
-                        <Menu.Item as='a'>Sign Up</Menu.Item>
-                    </Sidebar>
-
-                    <Sidebar.Pusher dimmed={sidebarOpened}>
-                        <Segment
-                            inverted
-                            textAlign='center'
-                            style={{ minHeight: 350, padding: '1em 0em' }}
-                            vertical
-                        >
-                            <Container>
-                                <Menu inverted pointing secondary size='large'>
-                                    <Menu.Item onClick={this.handleToggle}>
-                                        <Icon name='sidebar' />
-                                    </Menu.Item>
-                                    <Menu.Item position='right'>
-                                        <Button as='a' inverted>
-                                            Log in
-                                        </Button>
-                                        <Button as='a' inverted style={{ marginLeft: '0.5em' }}>
-                                            Sign Up
-                                        </Button>
-                                    </Menu.Item>
-                                </Menu>
-                            </Container>
-                            <HomepageHeading mobile />
-                        </Segment>
-                        {children}
-                    </Sidebar.Pusher>
-                </Sidebar.Pushable>
-            </Media>
-        );
-    }
-}
+        <Sidebar.Pusher dimmed={sidebarOpened}>
+          <Segment
+            inverted
+            textAlign='center'
+            style={{ minHeight: 350, padding: '1em 0em' }}
+            vertical
+          >
+            <Container>
+              <Menu inverted pointing secondary size='large'>
+                <Menu.Item onClick={handleToggle}>
+                  <Icon name='sidebar' />
+                </Menu.Item>
+                <Menu.Item position='right'>
+                  <Button as='a' inverted>
+                    Log in
+                  </Button>
+                  <Button as='a' inverted style={{ marginLeft: '0.5em' }}>
+                    Sign Up
+                  </Button>
+                </Menu.Item>
+              </Menu>
+            </Container>
+            {isHomepage && <HomepageHeading mobile />}
+          </Segment>
+          {children}
+        </Sidebar.Pusher>
+      </Sidebar.Pushable>
+    </Media>
+  );
+};
 
 MobileContainer.propTypes = {
-    children: PropTypes.node,
+  children: PropTypes.node,
 };
 
 const ResponsiveNavbar = ({ children }) => (
-    <MediaContextProvider>
-        <DesktopContainer>{children}</DesktopContainer>
-        <MobileContainer>{children}</MobileContainer>
-    </MediaContextProvider>
+  <MediaContextProvider>
+    <DesktopContainer>{children}</DesktopContainer>
+    <MobileContainer>{children}</MobileContainer>
+  </MediaContextProvider>
 );
 
 ResponsiveNavbar.propTypes = {
-    children: PropTypes.node,
+  children: PropTypes.node,
 };
 
 export default ResponsiveNavbar;

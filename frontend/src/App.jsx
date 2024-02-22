@@ -1,6 +1,6 @@
 import './App.css';
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 // import {Row, Col, Container} from 'reactstrap';
 import ForecastPage from './pages/forecast/ForecastPage';
 import MainPage from './pages/MainPage';
@@ -10,7 +10,7 @@ import Footer from './components/Footer';
 
 
 const BaseLayout = () => (
-        <BrowserRouter>
+        <>
           <Routes>
             <Route path="/">
               <Route path="/" element={<MainPage />} />
@@ -19,7 +19,7 @@ const BaseLayout = () => (
               </Route>
             </Route>
           </Routes>
-        </BrowserRouter>
+        </>
 
 );
 
