@@ -1,8 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-
-import { Container, Header } from 'semantic-ui-react'
+import { Container, Header, Segment } from 'semantic-ui-react'
 import LocationLookup from '../../components/LocationLookup';
 import IsButton from '../../components/IsButton'; // Ensure this is the correct import path
 
@@ -24,6 +23,7 @@ const ForecastPage = () => {
 
 
     return (
+        <Segment style={{ padding: '8em 0em' }} vertical>
         <Container>
 
         <Header as='h2'>Weather Forecast</Header>
@@ -31,6 +31,7 @@ const ForecastPage = () => {
             <LocationLookup setSelectedLocation={setSelectedLocation}/>      
             <IsButton onClick={handleSearch} label="Search"/>   
         </Container>
+        </Segment>
     );
 }
 
