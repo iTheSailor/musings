@@ -16,7 +16,7 @@ const LocationLookup = (props) => {
   
 
   function onSuggectionChange(value) {
-    console.log(value);
+
   }
 
   return <GeoapifyContext apiKey={GeoKey} >
