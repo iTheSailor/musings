@@ -23,7 +23,7 @@ const ForecastPage = () => {
 
 
     return (
-        <Segment style={{ padding: '8em 0em' }} vertical>
+        <Segment style={{ padding: '8em 0em', margin:'auto' }} vertical>
         <Container>
 
         <Header as='h2'>Weather Forecast</Header>
