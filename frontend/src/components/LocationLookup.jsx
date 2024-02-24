@@ -1,38 +1,34 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types'; // Import PropTypes
-import { GeoapifyGeocoderAutocomplete, GeoapifyContext } from '@geoapify/react-geocoder-autocomplete';
-import './Lookup.css';
+import React from 'react'
+import { GeoapifyGeocoderAutocomplete, GeoapifyContext } from '@geoapify/react-geocoder-autocomplete'
+import './Lookup.css'
+import PropTypes from 'prop-types'
 
-const LocationLookup = ({ setSelectedLocation }) => {
-  const [selectedLocation, setSelectedLocationState] = useState(null);
-
-  function onPlaceSelect(location) {
-      setSelectedLocationState(location); // Update local state
-      if (location && location.properties && location.properties.formatted) {
-          setSelectedLocation(location.properties.formatted); // Update parent component's state
-          console.log("Selected location:", location.properties.formatted); // Log the formatted location
-      } else {
-          console.log("Location selection is incomplete or undefined.");
-      }
-  }
-
+const LocationLookup = (props) => {
   const GeoKey = process.env.REACT_APP_GEOAPIFY_API_KEY;
 
-  return (
-      <GeoapifyContext apiKey={GeoKey}>
-          <GeoapifyGeocoderAutocomplete
-              placeholder="Enter address here"
-              value={selectedLocation}
-              placeSelect={onPlaceSelect}
-              allowNonVerifiedHouseNumber={true}
-              allowNonVerifiedStreet={true}
-          />
-      </GeoapifyContext>
-  );
-};
+
+
+  const onPlaceSelect = (location) => {
+      // Assuming 'location' is the new value you want to set
+      props.setSelectedLocation(location); // Or however you access the prop
+      console.log("New location selected:", location);
+  };
+  
+
+  function onSuggectionChange(value) {
+    console.log(value);
+  }
+
+  return <GeoapifyContext apiKey={GeoKey} >
+      <GeoapifyGeocoderAutocomplete placeholder="Enter address here"
+        placeSelect={onPlaceSelect}
+        suggestionsChange={onSuggectionChange}
+        />
+    </GeoapifyContext>
+}
 
 LocationLookup.propTypes = {
-  setSelectedLocation: PropTypes.func.isRequired, // Ensure that setSelectedLocation is a function
-};
+  setSelectedLocation: PropTypes.func.isRequired
+}
 
-export default LocationLookup;
+export default LocationLookup

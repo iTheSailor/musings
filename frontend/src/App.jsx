@@ -25,11 +25,11 @@ const BaseLayout = () => (
 
 function App() {
   return (
-    <div className="App" id="AppRoot">
+    <>
       <NavBar />
       <BaseLayout />
       <Footer />
-    </div>
+    </>
   );
 }
 

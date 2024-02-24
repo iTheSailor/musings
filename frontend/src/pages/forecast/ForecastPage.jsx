@@ -17,7 +17,7 @@ const ForecastPage = () => {
     }, [location]);
 
     const handleSearch = () => {
-        console.log('Searching for:', selectedLocation); // Log the current selected location
+        console.log('Searching for:', selectedLocation.type); // Log the current selected location
         // Here you can also handle other logic that should happen on search
         // No navigation logic if you don't want to navigate
     };
