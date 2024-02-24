@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Container, Header, Segment } from 'semantic-ui-react';
 import LocationLookup from '../../components/LocationLookup';
 import IsButton from '../../components/IsButton'; 
+import axios from 'axios';
 
 const ForecastPage = () => {
     const { location } = useParams();
@@ -28,7 +29,23 @@ const ForecastPage = () => {
     const handleSearch = () => {
         console.log('Searching for:', selectedLocation);
         console.log('Data from ref:', locationDataRef.current);
-    };
+        // Send the request to the server with the location data
+        axios.get('http://localhost:8000/api/weather', {
+            params: {
+                lat: locationDataRef.current.coordinates.lat,
+                lon: locationDataRef.current.coordinates.lon,
+                country_code: locationDataRef.current.country_code,
+                formatted: locationDataRef.current.formatted
+            }
+        }).then(response => {
+            console.log('Response:', response.data);
+        }
+        ).catch(error => {
+            console.error('Error:', error);
+        })
+    }
+
+
 
     return (
         <Segment style={{ padding: '8em 0em', margin: 'auto' }} vertical>
