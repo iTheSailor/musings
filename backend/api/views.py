@@ -13,6 +13,7 @@ class WeatherView(APIView):
         search = json.loads(search)
         data = forecast.location(search)
         weather_raw = data['weather']
+        current = data['current']
         address = data['address']
         weather = WeatherView.transform_weather_data(weather_raw)
         supplement_data = data['supplement']
@@ -28,7 +29,8 @@ class WeatherView(APIView):
         result = { 'weather': weather, 
                     'address': address, 
                     'supplemental': transformed_supplement, 
-                    'geodata': geodata
+                    'geodata': geodata,
+                    'current': current
                     }
 
         return Response(result)

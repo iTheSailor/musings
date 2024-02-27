@@ -28,8 +28,9 @@ def location(result):
 		supplement = supplemental(location)
 	location = (lat, lon, timezone)
 
-	weather = forecast(location)
-	data = {"address": _address, "weather": weather, "supplement": supplement, "geodata": geodata}
+	weather = forecast(location)[0]
+	current = forecast(location)[1]
+	data = {"address": _address, "weather": weather, "supplement": supplement, "geodata": geodata, "current": current}
 	return data
 
 def supplemental(search):
@@ -66,8 +67,8 @@ def forecast(search):
 	params={
 		"latitude": lattitude,
 		"longitude": longitude,
-		"hourly": "is_day",
-		"daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "sunrise", "sunset", "precipitation_sum", "precipitation_hours", "precipitation_probability_max"],
+		"current": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "precipitation", "cloud_cover", "wind_speed_10m", "wind_direction_10m", "wind_gusts_10m", "weather_code","is_day"],
+		"daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "precipitation_sum", "precipitation_hours", "precipitation_probability_max", "wind_speed_10m_max", "wind_gusts_10m_max"],
 		"forecast_hours": 6,
 		"temperature_unit": "fahrenheit",
 		"wind_speed_unit": "mph",
@@ -77,29 +78,46 @@ def forecast(search):
 	url = "https://api.open-meteo.com/v1/forecast"	
 	responses = openmeteo.weather_api(url, params=params)
 	response = responses[0]
-	hourly = response.Hourly()
-	hourly_is_day = hourly.Variables(0).ValuesAsNumpy()
 
-	hourly_data = {"date": pd.date_range(
-		start = pd.to_datetime(hourly.Time(), unit = "s"),
-		end = pd.to_datetime(hourly.TimeEnd(), unit = "s"),
-		freq = pd.Timedelta(seconds = hourly.Interval()),
-		inclusive = "left"
-	)}
-	hourly_data["is_day"] = hourly_is_day
-	hourly_dataframe = pd.DataFrame(data = hourly_data)
+	current = response.Current()
+	current_temperature_2m = current.Variables(0).Value()
+	current_relative_humidity_2m = current.Variables(1).Value()
+	current_apparent_temperature = current.Variables(2).Value()
+	current_precipitation = current.Variables(3).Value()
+	current_cloud_cover = current.Variables(4).Value()
+	current_wind_speed_10m = current.Variables(5).Value()
+	current_wind_direction_10m = current.Variables(6).Value()
+	current_wind_gusts_10m = current.Variables(7).Value()
+	current_weather_code = current.Variables(8).Value()
+	current_is_day = current.Variables(9).Value()
+	# Assuming 'current' is a proper response object containing the current weather data
+	current_dict = {}
+
+	current_dict["temperature"] = current_temperature_2m
+	current_dict["relative_humidity"] = current_relative_humidity_2m
+	current_dict["feelsLike"] = current_apparent_temperature
+	current_dict["precipitation"] = current_precipitation
+	current_dict["cloud_cover"] = current_cloud_cover
+	current_dict["wind_speed"] = current_wind_speed_10m
+	current_dict["wind_direction"] = current_wind_direction_10m
+	current_dict["wind_gusts"] = current_wind_gusts_10m
+	current_dict["code"] = str(int(current_weather_code))
+	if current_is_day == 1:
+		current_dict["is_day"] = "day"
+	else:
+		current_dict["is_day"] = "night"
+
 	daily = response.Daily()
 	daily_weather_code = daily.Variables(0).ValuesAsNumpy()
 	daily_temperature_2m_max = daily.Variables(1).ValuesAsNumpy()
 	daily_temperature_2m_min = daily.Variables(2).ValuesAsNumpy()
 	daily_apparent_temperature_max = daily.Variables(3).ValuesAsNumpy()
 	daily_apparent_temperature_min = daily.Variables(4).ValuesAsNumpy()
-	daily_sunrise = daily.Variables(5).ValuesAsNumpy()
-	daily_sunset = daily.Variables(6).ValuesAsNumpy()
-	daily_precipitation_sum = daily.Variables(7).ValuesAsNumpy()
-	daily_precipitation_hours = daily.Variables(8).ValuesAsNumpy()
-	daily_precipitation_probability_max = daily.Variables(9).ValuesAsNumpy()
-
+	daily_precipitation_sum = daily.Variables(5).ValuesAsNumpy()
+	daily_precipitation_hours = daily.Variables(6).ValuesAsNumpy()
+	daily_precipitation_probability_max = daily.Variables(7).ValuesAsNumpy()
+	daily_wind_speed_10m_max = daily.Variables(8).ValuesAsNumpy()
+	daily_wind_gusts_10m_max = daily.Variables(9).ValuesAsNumpy()
 	daily_data = {"date": pd.date_range(
 		start = pd.to_datetime(daily.Time(), unit = "s"),
 		end = pd.to_datetime(daily.TimeEnd(), unit = "s"),
@@ -111,19 +129,16 @@ def forecast(search):
 	daily_data["temperature_2m_min"] = daily_temperature_2m_min
 	daily_data["apparent_temperature_max"] = daily_apparent_temperature_max
 	daily_data["apparent_temperature_min"] = daily_apparent_temperature_min
-	daily_data["sunrise"] = daily_sunrise
-	daily_data["sunset"] = daily_sunset
 	daily_data["precipitation_sum"] = daily_precipitation_sum
 	daily_data["precipitation_hours"] = daily_precipitation_hours
 	daily_data["precipitation_probability_max"] = daily_precipitation_probability_max
+	daily_data["wind_speed_10m_max"] = daily_wind_speed_10m_max
+	daily_data["wind_gusts_10m_max"] = daily_wind_gusts_10m_max
 
 
 	daily_dataframe = pd.DataFrame(data = daily_data)
-	daily_string = daily_dataframe
-	hourly_string = hourly_dataframe
 	daily_dict = daily_dataframe.to_dict()
-	hourly_dict = hourly_dataframe.to_dict()
 
 	# print(daily_dataframe, hourly_dataframe)
 
-	return daily_dict
+	return daily_dict, current_dict
