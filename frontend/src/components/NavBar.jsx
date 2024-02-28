@@ -6,6 +6,11 @@ import { InView } from 'react-intersection-observer';
 import { useLocation } from 'react-router-dom'; // Import useLocation hook from react-router-dom
 import HomepageHeading from '../components/HomepageHeading.jsx'; // Make sure this path is correct
 import NavDropdown from './NavLinks.jsx'; // Make sure this path is correct
+import IsPortal from './IsPortal.jsx'; // Make sure this path is correct
+import LoginForm from './LoginForm.jsx';
+import SignupForm from './SignupForm.jsx';
+import LogOut from './LogOut.jsx';
+import { useAuth } from '../utils/AuthContext';
 
 const { MediaContextProvider, Media } = createMedia({
   breakpoints: {
@@ -15,13 +20,30 @@ const { MediaContextProvider, Media } = createMedia({
   },
 });
 
+const onLoginSuccess = (data) => {
+  localStorage.setItem('token', data.token);
+};
+
+const onSignupSuccess = (data) => {
+  localStorage.setItem('token', data.token);
+};
+
+
+const onLogOut = () => {
+  localStorage.removeItem('token');
+};
+
+
+
+
+
 // Convert DesktopContainer to a functional component to use hooks
 const DesktopContainer = ({ children }) => {
   const [fixed, setFixed] = React.useState(false);
   const location = useLocation(); // Use useLocation hook to get the current location
-  const isHomepage = location.pathname === '/'; // Check if the pathname is '/'
-
+  const isHomepage = location.pathname === '/';
   const toggleFixedMenu = (inView) => setFixed(!inView);
+  const { loggedIn, logOut } = useAuth() || {}; // Use the authentication state and logOut function
 
   return (
     <Media greaterThan='mobile'>
@@ -40,17 +62,25 @@ const DesktopContainer = ({ children }) => {
             size='large'
           >
             <Container>
-              
-                <NavDropdown />
-              
-              <Menu.Item position='right'>
-                <Button as='a' inverted={!fixed}>
-                  Log in
-                </Button>
-                <Button as='a' inverted={!fixed} primary={fixed} style={{ marginLeft: '0.5em' }}>
-                  Sign Up
-                </Button>
-              </Menu.Item>
+              <NavDropdown />
+              {!loggedIn ? ( // Check if user is not logged in
+                <>
+                  <Menu.Item position='right'>
+                    <IsPortal header="Login" label="Login" isInverted>
+                      <LoginForm onLoginSuccess={onLoginSuccess}/>
+                    </IsPortal>
+                  </Menu.Item>
+                  <Menu.Item>
+                    <IsPortal header="Signup" label="Signup" isInverted>
+                      <SignupForm onSignupSuccess={onSignupSuccess}/>
+                    </IsPortal>
+                  </Menu.Item>
+                </>
+              ) : (
+                <Menu.Item position='right'>
+                  <Button onClick={logOut} inverted>Log Out</Button>
+                </Menu.Item>
+              )}
             </Container>
           </Menu>
           {isHomepage && <HomepageHeading />}
@@ -60,7 +90,6 @@ const DesktopContainer = ({ children }) => {
     </Media>
   );
 };
-
 DesktopContainer.propTypes = {
   children: PropTypes.node,
 };
@@ -73,6 +102,8 @@ const MobileContainer = ({ children }) => {
 
   const handleSidebarHide = () => setSidebarOpened(false);
   const handleToggle = () => setSidebarOpened(true);
+  const { loggedIn } = useAuth() || {}; // Use the loggedIn state from the AuthContext
+
 
   return (
     <Media as={Sidebar.Pushable} at='mobile'>
@@ -107,6 +138,7 @@ const MobileContainer = ({ children }) => {
                 <Menu.Item onClick={handleToggle}>
                   <Icon name='sidebar' />
                 </Menu.Item>
+                {!loggedIn && (
                 <Menu.Item position='right'>
                   <Button as='a' inverted>
                     Log in
@@ -115,6 +147,12 @@ const MobileContainer = ({ children }) => {
                     Sign Up
                   </Button>
                 </Menu.Item>
+              )}
+              {loggedIn && (
+                <Menu.Item position='right'>
+                  <LogOut onLogOut={onLogOut}/>
+                </Menu.Item>
+              )}
               </Menu>
             </Container>
             {isHomepage && <HomepageHeading mobile />}

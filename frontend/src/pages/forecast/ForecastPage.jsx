@@ -5,6 +5,10 @@ import LocationLookup from '../../components/LocationLookup';
 import IsButton from '../../components/IsButton';
 import axios from 'axios';
 import weatherCodes from  './WeatherCode.json'
+import { useAuth } from '../../utils/AuthContext';
+import IsPortal from '../../components/IsPortal';
+import ForecastFavoritesForm from './ForecastFavoritesForm';
+import UserSavedLocations from './UserSavedLocations';
 
 
 const formatDate = (dateTimeStr) => {
@@ -52,6 +56,44 @@ const ForecastPage = () => {
     const [combinedData, setCombinedData] = useState([]);
     const [weatherCardHidden, setWeatherCardHidden] = useState(true);
 	const [currentWeather, setCurrentWeather] = useState([]);
+    const [isPortaOpen, setIsPortalOpen] = useState(false);
+
+    const { loggedIn } = useAuth();
+
+    const handleSearch = () => {
+        console.log("Selected Location:", selectedLocation);
+        console.log("Searching for:", locationDataRef.current);
+        axios.get(`${process.env.REACT_APP_API_URL}/api/weather`, {
+            params: {
+                lat: locationDataRef.current.coordinates.lat,
+                lon: locationDataRef.current.coordinates.lon,
+                country_code: locationDataRef.current.country_code,
+                formatted: locationDataRef.current.formatted,
+                timezone: locationDataRef.current.timezone
+            },
+        })
+        .then((response) => {
+            setWeatherData(response.data.weather || []);
+            setSupplementalData(response.data.supplemental || {}); // Note: Ensure this matches the key in your response
+            setAddress(response.data.address);
+            setWeatherCardHidden(false);
+			setCurrentWeather(response.data.current);
+            let _address = response.data.address;
+            let _address_string = JSON.stringify(_address);
+            localStorage.setItem('address', _address_string);
+
+            console.log("Fetched Data:", response.data); // Log the fetched data for debugging
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+    };
+
+
+    const handleFavoriteLoggedout = () => {
+        setIsPortalOpen(true);
+    };
+
 
     useEffect(() => {
         if (selectedLocation) {
@@ -67,31 +109,6 @@ const ForecastPage = () => {
             };
         }
     }, [selectedLocation]);
-    const handleSearch = () => {
-        console.log("Selected Location:", selectedLocation);
-        console.log("Searching for:", locationDataRef.current);
-        axios.get("http://localhost:8000/api/weather", {
-            params: {
-                lat: locationDataRef.current.coordinates.lat,
-                lon: locationDataRef.current.coordinates.lon,
-                country_code: locationDataRef.current.country_code,
-                formatted: locationDataRef.current.formatted,
-                timezone: locationDataRef.current.timezone
-            },
-        })
-        .then((response) => {
-            setWeatherData(response.data.weather || []);
-            setSupplementalData(response.data.supplemental || {}); // Note: Ensure this matches the key in your response
-            setAddress(response.data.address);
-            setWeatherCardHidden(false);
-			setCurrentWeather(response.data.current);
-
-            console.log("Fetched Data:", response.data); // Log the fetched data for debugging
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-        });
-    };
     useEffect(() => {
         if (weatherData.length > 0 && Object.keys(supplementalData).length > 0){
             const combined = combineData(supplementalData, weatherData);
@@ -105,13 +122,50 @@ const ForecastPage = () => {
     return (
         <Container>
             <Segment textAlign='center' style={{ padding: '2em 0em', margin: 'auto'}} vertical className='flex-column align-items-center'>
-                <Header as='h2'>Weather Forecast</Header>
+                {loggedIn &&
+                <Grid columns={2}>
+                    <Grid.Column align='left'>
+                    <Header as='h2'>Weather Forecast</Header>
+                    </Grid.Column>
+                    <Grid.Column align='right'>
+                        <IsPortal
+                        label='Saved Locations'
+                        open={isPortaOpen}
+                        onClose={() => setIsPortalOpen(false)}
+                        header="Saved Locations"
+                        >
+                            <UserSavedLocations />
+
+                        </IsPortal>
+                    </Grid.Column>
+                </Grid>
+
+            }
+            {!loggedIn &&
+                <Header as='h2'>Weather Forecast</Header>}
                 <LocationLookup setSelectedLocation={setSelectedLocation} />
                 <Divider></Divider>
                 <IsButton onClick={handleSearch} label="Search" className="searchButton"/>
             </Segment>
 			<Segment hidden={weatherCardHidden}>
+            <Grid columns={2}>
+                <Grid.Column >
 			<Header as='h3'>{address}</Header>
+                </Grid.Column>
+                <Grid.Column  align='right'>
+                    {loggedIn && 
+                    <IsPortal label='Add to Favorites' open={isPortaOpen} onClose={() => setIsPortalOpen(false)} header="Add to Favorites" >
+                        <ForecastFavoritesForm onSubmit={(data) => console.log(data)} address={address}/>
+                    </IsPortal>
+                    }
+                    {!loggedIn && 
+                    <IsPortal onClick={handleFavoriteLoggedout} open={isPortaOpen} onClose={() => setIsPortalOpen(false)} header="Login Required" label="Add to Favorites" >
+                        <p>You must be logged in to add favorites.</p>
+                    </IsPortal>
+                    }
+                </Grid.Column>
+
+            </Grid>
 				<Card fluid className='currentWeatherCard'>
 					<Card.Content>
 						<Card.Header>Current Weather</Card.Header>
