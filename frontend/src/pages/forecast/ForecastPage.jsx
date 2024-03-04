@@ -57,7 +57,7 @@ const ForecastPage = () => {
     const [combinedData, setCombinedData] = useState([]);
     const [weatherCardHidden, setWeatherCardHidden] = useState(true);
 	const [currentWeather, setCurrentWeather] = useState([]);
-    const [isPortaOpen, setIsPortalOpen] = useState(false);
+    const [isPortalOpen, setIsPortalOpen] = useState(false);
 
     const { loggedIn } = useAuth();
 
@@ -85,14 +85,18 @@ const ForecastPage = () => {
             setAddress(response.data.address);
             setWeatherCardHidden(false);
 			setCurrentWeather(response.data.current);
+            console.log((response.data))
             let _address = response.data.address;
             let _address_string = JSON.stringify(_address);
             localStorage.setItem('address', _address_string);
-            localStorage.setItem('lat', JSON.stringify(locationDataRef.current.coordinates.lat));
-            localStorage.setItem('lon', JSON.stringify(locationDataRef.current.coordinates.lon));
-            localStorage.setItem('timezone', JSON.stringify(locationDataRef.current.timezone));
-            localStorage.setItem('country_code', JSON.stringify(locationDataRef.current.country_code));
+            localStorage.setItem('lat', JSON.stringify(response.data.geodata.lat));
+            localStorage.setItem('lon', JSON.stringify(response.data.geodata.lon));
+            localStorage.setItem('timezone', JSON.stringify(response.data.timezone));
+            localStorage.setItem('country_code', JSON.stringify(response.data.country_code));
             console.log("Fetched Data:", response.data); // Log the fetched data for debugging
+            console.log(localStorage.getItem('lat'));
+            console.log(localStorage.getItem('lon'));
+            handleClose();
         })
         .catch((error) => {
             console.error("Error:", error);
@@ -107,7 +111,7 @@ const ForecastPage = () => {
     const handleLocationSelect = (location) => {
         // Update state with selected location
         setSelectedLocation(location); 
-        // Set up location data for search
+        setIsPortalOpen(false);
         locationDataRef.current = {
             coordinates: {
                 lat: location.lat,
@@ -117,8 +121,13 @@ const ForecastPage = () => {
             formatted: location.formatted,
             timezone: location.timezone,
         };
-        // Trigger the search
+        
+        
         handleSearch();
+    };
+    
+    const handleClose = () => {
+        setIsPortalOpen(false);
     };
 
 
@@ -157,13 +166,13 @@ const ForecastPage = () => {
                     </Grid.Column>
                     <Grid.Column align='right'>
                         <IsPortal
-                        label='Saved Locations'
-                        open={isPortaOpen}
-                        onClose={() => setIsPortalOpen(false)}
-                        header="Saved Locations"
+                            label='Saved Locations'
+                            open={isPortalOpen}
+                            onClose={() => setIsPortalOpen(false)}
+                            header="Saved Locations"
+                            
                         >
                             <UserSavedLocations onLocationSelect={handleLocationSelect}/>
-
                         </IsPortal>
                     </Grid.Column>
                 </Grid>
@@ -171,7 +180,9 @@ const ForecastPage = () => {
             }
             {!loggedIn &&
                 <Header as='h2'>Weather Forecast</Header>}
-                <LocationLookup setSelectedLocation={setSelectedLocation} />
+                <LocationLookup
+                setSelectedLocation={setSelectedLocation} 
+                />
                 <Divider></Divider>
                 <IsButton onClick={handleSearch} label="Search" className="searchButton"/>
             </Segment>
@@ -182,12 +193,12 @@ const ForecastPage = () => {
                 </Grid.Column>
                 <Grid.Column  align='right'>
                     {loggedIn && 
-                    <IsPortal label='Add to Favorites' open={isPortaOpen} onClose={() => setIsPortalOpen(false)} header="Add to Favorites" >
+                    <IsPortal label='Add to Favorites' open={isPortalOpen} onClose={() => setIsPortalOpen(false)} header="Add to Favorites" >
                         <ForecastFavoritesForm onSubmit={(data) => console.log(data)} address={address}/>
                     </IsPortal>
                     }
                     {!loggedIn && 
-                    <IsPortal onClick={handleFavoriteLoggedout} open={isPortaOpen} onClose={() => setIsPortalOpen(false)} header="Login Required" label="Add to Favorites" >
+                    <IsPortal onClick={handleFavoriteLoggedout} open={isPortalOpen} onClose={() => setIsPortalOpen(false)} header="Login Required" label="Add to Favorites" >
                         <p>You must be logged in to add favorites.</p>
                     </IsPortal>
                     }

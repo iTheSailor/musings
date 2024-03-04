@@ -9,9 +9,10 @@ import { useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 
-const UserSavedLocations = ({onLocationSelect}) => {
+const UserSavedLocations = ({onLocationSelect, handleClose}) => {
     UserSavedLocations.propTypes = {
         onLocationSelect: PropTypes.func.isRequired,
+        handleClose: PropTypes.func.isRequired,
     };
 
 
@@ -34,6 +35,7 @@ const UserSavedLocations = ({onLocationSelect}) => {
     const handleGetForecast = (location) => {
         console.log('Get forecast for:', location);
         onLocationSelect({...location});
+        handleClose();
     }
 
     const handleDeleteLocation = (location) => {

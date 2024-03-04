@@ -10,7 +10,7 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
-const FavoritesForm = ({onSubmit}) => {
+const FavoritesForm = ({onSubmit, handleClose}) => {
 
     FavoritesForm.propTypes = {
         onSubmit: PropTypes.func.isRequired,
@@ -19,6 +19,7 @@ const FavoritesForm = ({onSubmit}) => {
         lon: PropTypes.string.isRequired,
         timezone: PropTypes.string.isRequired,
         country_code: PropTypes.string.isRequired,
+        handleClose: PropTypes.func.isRequired,
     };
     const [nickname, setNickname] = useState('');
     const user = JSON.parse(localStorage.getItem('userId')) || '';
@@ -36,6 +37,7 @@ const FavoritesForm = ({onSubmit}) => {
             {address, nickname, user, lat, lon, timezone, country_code},
         ).then((response) => {
             onSubmit(response.data);
+            handleClose();
         }).catch((error) => {
             console.error('Failed to add favorite:', error);
         }

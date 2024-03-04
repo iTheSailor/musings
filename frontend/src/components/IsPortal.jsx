@@ -11,37 +11,38 @@ import {
 
 } from 'semantic-ui-react'
 import PropTypes from 'prop-types'
+import { useState } from 'react'
 
-export default class IsPortal extends Component {
-  state = { open: false }
-
-  handleClose = () => this.setState({ open: false })
-  handleOpen = () => this.setState({ open: true })
-
-  static propTypes = {
-    header: PropTypes.string,
-    children: PropTypes.node,
-    label: PropTypes.string,
-    isInverted: PropTypes.bool || false,
+const IsPortal = ({ header, children, label, isInverted=false, color }) => {
+  IsPortal.propTypes = {
+    header: PropTypes.string.isRequired,
+    children: PropTypes.node.isRequired,
+    label: PropTypes.string.isRequired,
+    isInverted: PropTypes.bool,
     color: PropTypes.string,
   }
 
-  render() {
-    const { open } = this.state
-    return (
+  const [open, setOpen] = useState(false)
+  const handleOpen = () => setOpen(true)
+  const handleClose = () => setOpen(false)
+  const enhancedChildren = React.Children.map(children, child => 
+    React.cloneElement(child, { handleClose })
+  );
+
+  return (
     
       <Grid >
         <GridColumn>
           <Button
-            content={this.props.label}
+            content={label}
             disabled={open}
-            inverted={this.props.isInverted}
-            onClick={this.handleOpen}
-            color={this.props.color}
+            inverted={isInverted}
+            onClick={handleOpen}
+            color={color}
             
           />
 
-          <Portal onClose={this.handleClose} open={open}>
+          <Portal onClose={handleClose} open={open}>
             <Segment
               style={{
                 position: 'fixed',  // Use fixed positioning
@@ -61,12 +62,12 @@ export default class IsPortal extends Component {
                 <GridColumn align='left'>
                 </GridColumn>
                 <GridColumn align='middle'>
-                {this.props.header}
+                {header}
                 </GridColumn>
                 <GridColumn align='right'>
                 <Icon
                   name='close'
-                  onClick={this.handleClose}
+                  onClick={handleClose}
                   style={{ cursor: 'pointer'}}
                   color='black'
                 />
@@ -74,7 +75,7 @@ export default class IsPortal extends Component {
                 </Grid>
               </Header>
               <Container style={{width: '100%', margin:'auto'}}>
-                {this.props.children}
+                {enhancedChildren}
               </Container>
               <br />
              
@@ -84,4 +85,5 @@ export default class IsPortal extends Component {
       </Grid>
     )
   }
-}
+
+export default IsPortal

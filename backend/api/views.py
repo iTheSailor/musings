@@ -32,13 +32,17 @@ class WeatherView(APIView):
                 supplement_data[date] = ["No supplemental data available for this location."]
             supplement = supplement_data
         geodata = data['geodata']
+        country_code = search['country_code']
+        timezone = search['timezone']
         # print(geodata)
 
         result = { 'weather': weather, 
                     'address': address, 
                     'supplemental': supplement, 
                     'geodata': geodata,
-                    'current': current
+                    'current': current,
+                    'country_code': country_code,
+                    'timezone': timezone
                     }
 
         return Response(result)
