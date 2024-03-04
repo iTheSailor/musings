@@ -1,7 +1,7 @@
 import React from 'react';
 import {
+    FormField,
     FormInput,
-    FormGroup,
     Form,
     Segment,
     Button
@@ -69,9 +69,9 @@ const LoginForm = ({ onLoginSuccess }) => {
     };
 
     return (
-        <Segment className='authFormSegment'>
-            <Form className='loginForm' onSubmit={handleSubmit}>
-                <FormGroup>
+        <Segment className='authFormSegment' style={{width:'100%'}}>
+            <Form className='loginForm' onSubmit={handleSubmit} style={{width:'100%', display:'flex', flexDirection:'column'}}>
+                <FormField>
                     <FormInput
                         label='Username'
                         placeholder='Username'
@@ -79,8 +79,8 @@ const LoginForm = ({ onLoginSuccess }) => {
                         onChange={handleUsernameChange}
                         error={usernameError ? {content: 'Username is required', pointing: 'below'} : false}
                     />
-                </FormGroup>
-                <FormGroup>
+                </FormField>
+                <FormField>
                     <FormInput
                         label='Password'
                         placeholder='Password'
@@ -89,8 +89,9 @@ const LoginForm = ({ onLoginSuccess }) => {
                         onChange={handlePasswordChange}
                         error={passwordError ? {content: 'Password is required', pointing: 'below'} : false}
                     />
-                </FormGroup>
-                <Button type='submit'>Submit</Button>
+                </FormField>
+
+                <Button type='submit' style={{margin:'auto'}}>Submit</Button>
             </Form>
         </Segment>
     );

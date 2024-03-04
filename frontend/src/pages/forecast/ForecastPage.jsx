@@ -14,15 +14,15 @@ import UserSavedLocations from './UserSavedLocations';
 const formatDate = (dateTimeStr) => {
     return dateTimeStr.split('T')[0]; // Converts '2024-02-25T05:00:00' to '2024-02-25'
 };
-
 const combineData = (supplemental, weather) => {
     const combined = {};
     weather.forEach((day) => {
         const dateKey = formatDate(day.date);
+        // Ensure there's at least a default forecast entry for each day
         combined[dateKey] = {
             date: day.date,
             weather: {
-                high : day.temperature_2m_max,
+                high: day.temperature_2m_max,
                 low: day.temperature_2m_min,
                 feelsHigh: day.apparent_temperature_max,
                 feelsLow: day.apparent_temperature_min,
@@ -30,14 +30,15 @@ const combineData = (supplemental, weather) => {
                 precipitationAmount: day.precipitation_sum,
                 windSpeed: day.wind_speed_10m_max,
                 windGust: day.wind_gusts_10m_max,
-				code: day.weather_code,
-				is_day: "day",
+                code: day.weather_code,
+                is_day: "day",
             },
-            forecasts: supplemental[dateKey] || [],
+            forecasts: supplemental[dateKey] || [{ detailedForecast: "Detailed forecast not available for locations outside of the US." }], // Provide a default message
         };
     });
     return Object.values(combined); // Convert the combined object into an array
 };
+
 
 function degToCompass(num) {
     const val = Math.floor((num / 22.5) + 0.5);
@@ -62,6 +63,12 @@ const ForecastPage = () => {
 
     const handleSearch = () => {
         console.log("Selected Location:", selectedLocation);
+        //clear out previous data
+        setWeatherData([]);
+        setSupplementalData({});
+        setAddress('');
+        setCombinedData([]);
+        setWeatherCardHidden(true);
         console.log("Searching for:", locationDataRef.current);
         axios.get(`${process.env.REACT_APP_API_URL}/api/weather`, {
             params: {
@@ -81,7 +88,10 @@ const ForecastPage = () => {
             let _address = response.data.address;
             let _address_string = JSON.stringify(_address);
             localStorage.setItem('address', _address_string);
-
+            localStorage.setItem('lat', JSON.stringify(locationDataRef.current.coordinates.lat));
+            localStorage.setItem('lon', JSON.stringify(locationDataRef.current.coordinates.lon));
+            localStorage.setItem('timezone', JSON.stringify(locationDataRef.current.timezone));
+            localStorage.setItem('country_code', JSON.stringify(locationDataRef.current.country_code));
             console.log("Fetched Data:", response.data); // Log the fetched data for debugging
         })
         .catch((error) => {
@@ -93,6 +103,24 @@ const ForecastPage = () => {
     const handleFavoriteLoggedout = () => {
         setIsPortalOpen(true);
     };
+
+    const handleLocationSelect = (location) => {
+        // Update state with selected location
+        setSelectedLocation(location); 
+        // Set up location data for search
+        locationDataRef.current = {
+            coordinates: {
+                lat: location.lat,
+                lon: location.lon,
+            },
+            country_code: location.country_code,
+            formatted: location.formatted,
+            timezone: location.timezone,
+        };
+        // Trigger the search
+        handleSearch();
+    };
+
 
 
     useEffect(() => {
@@ -134,7 +162,7 @@ const ForecastPage = () => {
                         onClose={() => setIsPortalOpen(false)}
                         header="Saved Locations"
                         >
-                            <UserSavedLocations />
+                            <UserSavedLocations onLocationSelect={handleLocationSelect}/>
 
                         </IsPortal>
                     </Grid.Column>
@@ -198,74 +226,72 @@ const ForecastPage = () => {
 				</Card>
 			</Segment>
             <Segment hidden={weatherCardHidden}>
-                
-                <Grid padded columns={2} divided>
-                    {combinedData.map((day, index) => (
-                        <Grid.Row key={index}>
-                            <Grid.Column>
-                                <Card fluid>
-									<Grid centered celled columns={2}>   
-										<Grid.Column verticalAlign="middle">                              
-                                    <Card.Content>
-                                        <Card.Header className='dailyWeatherCardHeader'>{new Date(day.date).toLocaleDateString()}
-										</Card.Header>
+    <Grid padded columns={2} divided>
+        {combinedData.map((day, index) => (
+            <Grid.Row key={index}>
+                <Grid.Column>
+                    <Card fluid>
+                        <Grid centered celled columns={2}>
+                            <Grid.Column verticalAlign="middle">
+                                <Card.Content>
+                                    <Card.Header className='dailyWeatherCardHeader'>
+                                        {new Date(day.date).toLocaleDateString()}
+                                    </Card.Header>
+                                </Card.Content>
+                            </Grid.Column>
+                            <Grid.Column verticalAlign="left">
+                                <Card.Content>
+                                    <Card.Meta>
+                                        <img src={weatherCodes[day.weather.code]?.[day.weather.is_day].image || 'default_image_url'} alt="Weather icon" />
+                                        {weatherCodes[day.weather.code]?.[day.weather.is_day].description || 'No description available'}
+                                    </Card.Meta>
+                                </Card.Content>
+                            </Grid.Column>
+                        </Grid>
+                        <Grid centered celled columns={2}>
+                            <Grid.Column verticalAlign="middle">
+                                <Card.Content>
+                                    <Card.Description>Hi: {parseInt(day.weather.high)}°F</Card.Description>
+                                    <Card.Description>Lo: {parseInt(day.weather.low)}°F</Card.Description>
+                                    <Card.Description>Chance of Precipitation: {day.weather.precipitationChance}%</Card.Description>
+                                    <Card.Description>Precipitation Amount: {parseFloat(day.weather.precipitationAmount).toFixed(2)}&ldquo;</Card.Description>
+                                </Card.Content>
+                            </Grid.Column>
+                            <Grid.Column verticalAlign='middle'>
+                                <Card.Content>
+                                    <Card.Description>Feels Like Hi: {parseInt(day.weather.feelsHigh)}°F</Card.Description>
+                                    <Card.Description>Feels Like Lo: {parseInt(day.weather.feelsLow)}°F</Card.Description>
+                                    <Card.Description>Wind Speed: {parseInt(day.weather.windSpeed)} mph</Card.Description>
+                                    <Card.Description>Wind Gust: {parseInt(day.weather.windGust)} mph</Card.Description>
+                                </Card.Content>
+                            </Grid.Column>
+                        </Grid>
+                    </Card>
+                </Grid.Column>
+                <Grid.Column>
+                    {day.forecasts.length > 0 ? day.forecasts.map((forecast, idx) => (
+                        <Card fluid key={idx}>
+                            <Card.Content>
+                                <Card.Description>
+                                    {forecast.detailedForecast}
+                                </Card.Description>
+                            </Card.Content>
+                        </Card>
+                    )) : <Card fluid>
+                            <Card.Content>
+                                <Card.Description>
+                                    Detailed forecast is not available for this location.
+                                </Card.Description>
+                            </Card.Content>
+                        </Card>
+                    }
+                </Grid.Column>
+                <Divider />
+            </Grid.Row>
+        ))}
+    </Grid>
+</Segment>
 
-                                    </Card.Content>
-									</Grid.Column>
-									<Grid.Column verticalAlign="left">
-									<Card.Content>
-										<Card.Meta>
-											<img src={weatherCodes[day.weather.code]?.[day.weather.is_day].image || 'default_image_url'} alt="Weather icon" />
-											{weatherCodes[day.weather.code]?.[day.weather.is_day].description || 'No description available'}
-										</Card.Meta>
-									</Card.Content>
-									</Grid.Column>
-									</Grid>
-                                    <Grid centered celled columns={2}>
-                                        <Grid.Column verticalAlign="middle">
-                                            <Card.Content>
-                                                <Card.Description>Hi: {parseInt(day.weather.high)}°F</Card.Description>
-                                                <Card.Description>Lo: {parseInt(day.weather.low)}°F</Card.Description>
-												<Card.Description>Chance of Precipitation: {day.weather.precipitationChance}%</Card.Description>
-												<Card.Description>Precipitation Amount: {parseFloat(day.weather.precipitationAmount).toFixed(2)}&ldquo;</Card.Description>
-                                            </Card.Content>
-                                        </Grid.Column>
-                                    <Grid.Column verticalAlign='middle'>
-                                    <Card.Content>
-                                        <Card.Description>Feels Like Hi: {parseInt(day.weather.feelsHigh)}°F</Card.Description>
-                                        <Card.Description>Feels Like Lo: {parseInt(day.weather.feelsLow)}°F</Card.Description>
-										<Card.Description>Wind Speed: {parseInt(day.weather.windSpeed)} mph</Card.Description>
-										<Card.Description>Wind Gust: {parseInt(day.weather.windGust)} mph</Card.Description>
-                                    </Card.Content>
-                                    </Grid.Column>
-                                    </Grid>
-                                </Card>
-                            </Grid.Column>
-                            <Grid.Column>
-                                {locationDataRef.current.country_code === "us" ?
-                                    day.forecasts.map((forecast, idx) => (
-                                        <Card fluid key={idx}>
-                                            <Card.Content>
-                                                <Card.Description>
-                                                    {forecast.isDaytime ? 'Daytime' : 'Nighttime'}: {forecast.detailedForecast}
-                                                </Card.Description>
-                                            </Card.Content>
-                                        </Card>
-                                    )) :
-                                    <Card fluid>
-                                        <Card.Content>
-                                            <Card.Description>
-                                                Detailed forecast is only available for US locations.
-                                            </Card.Description>
-                                        </Card.Content>
-                                    </Card>
-                                }
-                            </Grid.Column>
-                            <Divider />
-                        </Grid.Row>
-                    ))}
-                </Grid>
-            </Segment>
         </Container>
     );
 };

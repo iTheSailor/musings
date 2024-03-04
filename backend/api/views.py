@@ -2,6 +2,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from . import forecast
+from sudoku.models import Sudoku
+from . import sudoku_logic
 from forecast.models import UserLocation
 from django.contrib.auth.models import User
 
@@ -23,12 +25,18 @@ class WeatherView(APIView):
                 detailed_forecasts = [{'detailedForecast': period['detailedForecast'], 
                                     'isDaytime': period['isDaytime']} for period in forecasts]
                 transformed_supplement[date] = detailed_forecasts
+                supplement = transformed_supplement
+        else:
+            supplement_data = {}
+            for date in weather_raw['date']:
+                supplement_data[date] = ["No supplemental data available for this location."]
+            supplement = supplement_data
         geodata = data['geodata']
         # print(geodata)
 
         result = { 'weather': weather, 
                     'address': address, 
-                    'supplemental': transformed_supplement, 
+                    'supplemental': supplement, 
                     'geodata': geodata,
                     'current': current
                     }
@@ -42,7 +50,11 @@ class WeatherView(APIView):
         user = User.objects.get(id=user_id)
         address = request.data['address']
         nickname = request.data['nickname']
-        user_location = UserLocation(user=user, address=address, nickname=nickname )
+        lat = request.data['lat']
+        lon = request.data['lon']
+        timezone = request.data['timezone']
+        country_code = request.data['country_code']
+        user_location = UserLocation(user=user, address=address, nickname=nickname, lat=lat, lon=lon, timezone=timezone, country_code=country_code)
         user_location.save()
         return Response({'status': 'success'})
     
@@ -64,19 +76,34 @@ class UserLocationView(APIView):
         locations = []
         for location in user_locations:
             locations.append({
-                'id': location.id,
+                'locationId': location.id,
+                'address': location.address,
+                'nickname': location.nickname,
+                'lat': location.lat,
+                'lon': location.lon,
+                'formatted': location.address,
+                'timezone': location.timezone,
+                'country_code': location.country_code
+            })
+        return Response(locations)
+    
+    def delete(self, request, format=None):
+        location_id = request.data['location_id']
+        location = UserLocation.objects.get(id=location_id)
+        user = location.user
+        location.delete()
+        user_locations = UserLocation.objects.filter(user=user)
+        locations = []
+        for location in user_locations:
+            locations.append({
+                'locationId': location.id,
                 'address': location.address,
                 'nickname': location.nickname,
                 'lat': location.lat,
                 'lon': location.lon
             })
-        return Response({'locations': locations})
     
-    def delete(self, request, format=None):
-        location_id = request.data['location_id']
-        location = UserLocation.objects.get(id=location_id)
-        location.delete()
-        return Response({'status': 'success'})
+        return Response({'status': 'success', 'data': locations})
     
     def put(self, request, format=None):
         location_id = request.data['location_id']
@@ -86,6 +113,31 @@ class UserLocationView(APIView):
         location.save()
         return Response({'status': 'success'})
     
+class GenerateSudokuView(APIView):
+    def get(self, request, format=None):
+        try:
+            userid = request.GET['userid']
+            user = User.objects.get(id=userid)
+        except:
+            user = None
+        difficulty = request.GET['difficulty']
+        puzzle = sudoku_logic.generate_puzzle(difficulty)
+        if puzzle is not None:
+            Sudoku.objects.create(difficulty=difficulty, puzzle=puzzle[0], solution=puzzle[1], player=user)
+            return Response({'status': 'success', 'puzzle': puzzle})
+        else:
+            return Response({'status': 'failure'})
+        
+class SolveSudokuView(APIView):
+    def post(self, request, format=None):
+        try:
+            data= json.loads(request.body)
+            puzzle = data['puzzle']
+            solution = data['solution']
+            is_correct = sudoku_logic.check_sudoku_board(puzzle, solution)
+            return Response({'status': 'success', 'is_correct': is_correct})
+        except:
+            return Response({'status': 'failure'})
 
 class LoginView(APIView):
     def post(self, request, format=None):

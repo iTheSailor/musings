@@ -15,17 +15,25 @@ const FavoritesForm = ({onSubmit}) => {
     FavoritesForm.propTypes = {
         onSubmit: PropTypes.func.isRequired,
         address: PropTypes.string.isRequired,
+        lat: PropTypes.string.isRequired,
+        lon: PropTypes.string.isRequired,
+        timezone: PropTypes.string.isRequired,
+        country_code: PropTypes.string.isRequired,
     };
     const [nickname, setNickname] = useState('');
     const user = JSON.parse(localStorage.getItem('userId')) || '';
     const address = JSON.parse(localStorage.getItem('address')) || '';
+    const lat = JSON.parse(localStorage.getItem('lat')) || '';
+    const lon = JSON.parse(localStorage.getItem('lon')) || '';
+    const timezone = JSON.parse(localStorage.getItem('timezone')) || '';
+    const country_code = JSON.parse(localStorage.getItem('country_code')) || '';
     console.log('user:', user, 'address:', address);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         axios.post(
             `${process.env.REACT_APP_API_URL}/api/weather`,
-            {address, nickname, user}
+            {address, nickname, user, lat, lon, timezone, country_code},
         ).then((response) => {
             onSubmit(response.data);
         }).catch((error) => {
@@ -48,6 +56,8 @@ const FavoritesForm = ({onSubmit}) => {
                 </FormGroup>
                 <input type="hidden" value={user} />
                 <input type="hidden" value={address} />
+                <input type="hidden" value={lat} />
+                <input type="hidden" value={lon} />
 
                 <Button type="submit">Add Favorite</Button>
             </Form>

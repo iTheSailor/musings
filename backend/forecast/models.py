@@ -9,6 +9,8 @@ class UserLocation(models.Model):
     nickname = models.CharField(max_length=250, blank=True, null=True)
     lat = models.CharField(max_length=100)
     lon = models.CharField(max_length=100)
+    timezone = models.CharField(max_length=100, blank=True, null=True)
+    country_code = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

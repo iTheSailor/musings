@@ -49,7 +49,11 @@ export default class IsPortal extends Component {
                 left: '50%',        // Position the left edge of the segment in the middle of the screen horizontally
                 transform: 'translate(-50%, -50%)', // Shift the segment up by 50% of its height and left by 50% of its width
                 zIndex: 1000,           // Set the width to 50% of the screen
-                width: '50%',           // Set the height to 50% of the screen
+                width: '50%',
+                height: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                justify_content: 'center',
               }}
             >
               <Header>
@@ -69,7 +73,7 @@ export default class IsPortal extends Component {
                 </GridColumn>
                 </Grid>
               </Header>
-              <Container style={{width: 'fit-content'}} onSubmit={this.handleClose}>
+              <Container style={{width: '100%', margin:'auto'}}>
                 {this.props.children}
               </Container>
               <br />

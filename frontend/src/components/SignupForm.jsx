@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     FormInput,
-    FormGroup,
+    FormField,
     Form,
     Segment,
     Button
@@ -69,25 +69,25 @@ const SignupForm = ({onSignupSuccess}) => {
 
 
     return (
-        <Segment className='authFormSegment'>
-            <Form className='signupForm' onSubmit={handleSubmit}>
-                <FormGroup>
+        <Segment className='authFormSegment' style={{width:'100%'}}>
+            <Form className='signupForm' onSubmit={handleSubmit}  style={{width:'100%', display:'flex', flexDirection:'column'}}>
+                <FormField>
                     <FormInput
                         label='Username'
                         placeholder='Username'
                         onChange={handleUsernameChange}
                         error= {usernameError? {content:'Username is required', pointing:'below'} : false}
                     />
-                </FormGroup>
-                <FormGroup>
+                </FormField>
+                <FormField>
                     <FormInput
                         label='Email'
                         placeholder='Email'
                         onChange={handleEmailChange}
                         error= {emailError? {content:'Email is required', pointing:'below'} : false}
                     />
-                </FormGroup>
-                <FormGroup>
+                </FormField>
+                <FormField>
                     <FormInput
                         label='Password'
                         placeholder='Password'
@@ -95,8 +95,8 @@ const SignupForm = ({onSignupSuccess}) => {
                         onChange={handlePasswordChange}
                         error= {passwordError? {content:'Password is required', pointing:'below'} : false}
                     />
-                </FormGroup>
-                <Button type='submit'>Submit</Button>
+                </FormField>
+                <Button type='submit' style={{margin:'auto'}}>Submit</Button>
             </Form>
         </Segment>
     );
