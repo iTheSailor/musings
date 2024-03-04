@@ -5,7 +5,6 @@ def is_valid(board, row, col, num):
     for x in range(9):
         if board[row][x] == num or board[x][col] == num:
             return False
-
     startRow = row - row % 3
     startCol = col - col % 3
     for i in range(3):
@@ -27,24 +26,15 @@ def solve_sudoku(board):
     l = [0, 0]
     if not find_empty_location(board, l):
         return True
-
     row, col = l
     nums = list(range(1,10))
     random.shuffle(nums)
-
     for num in nums:
         if is_valid(board, row, col, num):
-        
             board[row][col] = num
-
-        
             if solve_sudoku(board):
                 return True
-
-        
             board[row][col] = 0
-
-
     return False
 
 
@@ -57,25 +47,9 @@ def generate_sudoku_solution():
         return board
     return None
 
-def remove_numbers_to_create_puzzle(board, clues):
-    # Create a copy of the original board
-    original_board = np.copy(board)
-    puzzle_board = np.copy(board)
-
-    count = 81 - clues
-    while count > 0:
-        i, j = random.randint(0, 8), random.randint(0, 8)
-        if puzzle_board[i][j] != 0:
-            puzzle_board[i][j] = 0
-            count -= 1
-
-    # Return both the original (solved) board and the puzzle board
-    return [puzzle_board, original_board]
 
 def generate_puzzle(difficulty):
-
     solution_board = generate_sudoku_solution()
-
     clues = int()   
     if difficulty == 'test':
         clues = 80
@@ -86,11 +60,19 @@ def generate_puzzle(difficulty):
     if difficulty == 'hard':
         clues = 20
     if solution_board is not None:
-        
-        boards = remove_numbers_to_create_puzzle(solution_board.tolist(), clues)
-        # print(f'puzzle board {boards[0]}')
-        # print(f'solution board {boards[1]}')
-        return boards
+        board = remove_numbers_to_create_puzzle(solution_board.tolist(), clues)
+        return board
+
+def remove_numbers_to_create_puzzle(board, clues):
+    puzzle_board = np.copy(board)
+    count = 81 - clues
+    while count > 0:
+        i, j = random.randint(0, 8), random.randint(0, 8)
+        if puzzle_board[i][j] != 0:
+            puzzle_board[i][j] = 0
+            count -= 1
+    return puzzle_board
+
     
     
 def check_sudoku_board(board):

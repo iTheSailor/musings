@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import './Sudoku.css';
 
 const SudokuCell = ({ cell, rowIndex, colIndex, onInputChange }) => {
     SudokuCell.propTypes = {
@@ -10,7 +10,6 @@ const SudokuCell = ({ cell, rowIndex, colIndex, onInputChange }) => {
         onInputChange: PropTypes.func.isRequired,
     };
     const handleChange = (event) => {
-        // Only allow numbers 1-9
         const newValue = event.target.value.replace(/[^1-9]/g, '');
         if (newValue.length <= 1) {
             onInputChange(newValue, rowIndex, colIndex);

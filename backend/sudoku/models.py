@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 class Sudoku(models.Model):
     player = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     puzzle = models.TextField()
-    solution = models.TextField()
     current_state = models.TextField()
     difficulty = models.CharField(max_length=10)
     time = models.IntegerField(default=0)

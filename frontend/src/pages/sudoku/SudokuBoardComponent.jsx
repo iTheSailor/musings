@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import SudokuCell from './SudokuCellComponent';
+import PropTypes from 'prop-types';
+import './Sudoku.css';
 
-const SudokuBoard = () => {
+const SudokuBoard = ({puzzle}) => {
+
+    // State to hold the board
+    SudokuBoard.propTypes = {
+        puzzle: PropTypes.array,
+    };
     const [board, setBoard] = useState(Array(9).fill().map(() => Array(9).fill({ value: 0, clue: false })));
 
     // Function to initialize the board
@@ -27,6 +34,11 @@ const SudokuBoard = () => {
         newBoard[rowIndex][colIndex].value = newValue;
         setBoard(newBoard);
     };
+    useEffect(() => {
+        if (puzzle.length) {
+            initializeBoard(puzzle);
+        }
+    }, [puzzle]);
 
     return (
         <div id="sudokuBoard" className="sudoku-board">

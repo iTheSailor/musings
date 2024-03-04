@@ -123,7 +123,8 @@ class GenerateSudokuView(APIView):
         difficulty = request.GET['difficulty']
         puzzle = sudoku_logic.generate_puzzle(difficulty)
         if puzzle is not None:
-            Sudoku.objects.create(difficulty=difficulty, puzzle=puzzle[0], solution=puzzle[1], player=user)
+            Sudoku.objects.create(difficulty=difficulty, puzzle=puzzle, player=user)
+            print(puzzle)
             return Response({'status': 'success', 'puzzle': puzzle})
         else:
             return Response({'status': 'failure'})
