@@ -36,3 +36,27 @@
     transform: rotate(360deg);
   }
 }
+
+.AppNavbar{
+  margin: 0;
+  padding: 0;
+  height: 6rem;
+}
+
+.AppContent{
+  min-height: calc(100dvh - 16rem);
+}
+
+#AppFooter{
+  margin-top: 0;
+  margin-bottom: -1rem;
+  padding: 1rem 0;
+  height: 10rem;
+
+}
+#MainPage{
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0;
+  height: 100%;
+}

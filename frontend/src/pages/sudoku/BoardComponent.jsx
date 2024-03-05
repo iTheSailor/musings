@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import SudokuCell from './SudokuCellComponent';
+import SudokuCell from './CellComponent';
 import PropTypes from 'prop-types';
 import './Sudoku.css';
 

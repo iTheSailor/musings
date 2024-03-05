@@ -2,7 +2,7 @@ import React from 'react';
 import { Container, Header, Segment, Card, Grid, Divider } from 'semantic-ui-react';
 import IsButton from '../../components/IsButton';
 import IsPortal from '../../components/IsPortal';
-import DifficultySelector from './DifficultySelector';
+import DifficultySelector from './DifficultySelectorComponent';
 import { useState, useEffect } from 'react';
 import { useNavigate} from 'react-router-dom';
 // import PropTypes from 'prop-types';
@@ -11,29 +11,7 @@ import axios from 'axios';
 
 
 const SudokuPage = () => {
-    const [difficulty, setDifficulty] = useState('');
-    const navigate = useNavigate();
-
-    useEffect (() => {
-        console.log('Difficulty:', difficulty);
-    }, [difficulty]);
-
-    const startGame = () => {
-        console.log('Start game with difficulty:', difficulty);
-        console.log('user:', localStorage.getItem('userId'));
-
-        axios.get(`${process.env.REACT_APP_API_URL}/api/sudoku/play`, {
-            params: {
-                difficulty: difficulty,
-                userid: localStorage.getItem('userId')
-            }
-        }).then((response) => {
-            console.log('Game started:', response.data);
-            navigate('/apps/sudoku/game', {state: {puzzle: response.data.puzzle, gameid: response.data.gameid, difficulty: difficulty, userid: localStorage.getItem('userId')}});
-        }).catch((error) => {
-            console.error('Failed to start game:', error);
-        });
-    }
+    
 
     return (
         <Container>
@@ -51,7 +29,7 @@ const SudokuPage = () => {
                                     label='Go!'
                                     content={<p>Play Sudoku</p>}
                                 >
-                                    <DifficultySelector onDifficultySelect={setDifficulty} startGame={startGame}/>
+                                    <DifficultySelector />
                                 </IsPortal>     
                             </Card.Content>
                         </Card>

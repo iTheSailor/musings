@@ -3,7 +3,7 @@ import React from 'react'
 import { Button, Container, Header, Icon } from 'semantic-ui-react'
 
 const HomepageHeading = ({ mobile }) => (
-    <Container text>
+    <Container text >
       <Header
         as='h1'
         content='Ibrahim Salir'

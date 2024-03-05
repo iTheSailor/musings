@@ -1,8 +1,12 @@
 import React from 'react';
 import { Button, Container, Divider, Grid, Header, Image, Segment } from 'semantic-ui-react';
 
+
 const MainPage = () => (
-    <div>
+    <>
+        <Container style={{height: '26rem'}}>
+        </Container>
+
         <Segment style={{ padding: '8em 0em' }} vertical>
             <Grid container stackable verticalAlign='middle'>
                 <Grid.Row>
@@ -90,7 +94,7 @@ const MainPage = () => (
                 </Button>
             </Container>
         </Segment>
-    </div>
+    </>
 );
 
 export default MainPage;
