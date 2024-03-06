@@ -9,14 +9,15 @@ export const useAuth = () => {
         throw new Error('useAuth must be used within an AuthProvider');
     }
     return context;
+    
 }
 
 
 export const AuthProvider = ({ children }) => {
+  AuthProvider.propTypes = {
+      children: PropTypes.node.isRequired,
+  };
 
-    AuthProvider.propTypes = {
-        children: PropTypes.node.isRequired,
-    };
   const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem('token'));
 
   const logIn = (token) => {
@@ -27,7 +28,9 @@ export const AuthProvider = ({ children }) => {
   const logOut = () => {
     localStorage.removeItem('token');
     setLoggedIn(false);
-  };
+  }
+    
+
 
   return (
     <AuthContext.Provider value={{ loggedIn, logIn, logOut }}>

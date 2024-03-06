@@ -53,16 +53,16 @@ const LoginForm = ({ onLoginSuccess }) => {
                 body: JSON.stringify({ username, password }),
             });
             const data = await response.json();
-            if (response.ok) {
+            // if (response.status ) {
                 logIn(data.token); // Log in user
-                onLoginSuccess(data); // You can keep this if you still need to do something with data on successful login
-                let userId = data.user_id
-                localStorage.setItem('userId', JSON.stringify(userId))
-                let username = data.username
-                localStorage.setItem('username',JSON.stringify(username))
-            } else {
-                console.error('Login failed:', data.message);
-            }
+                // onLoginSuccess(data); // You can keep this if you still need to do something with data on successful login
+                // let userId = data.user_id
+                // localStorage.setItem('userId', JSON.stringify(userId))
+                // let username = data.username
+                // localStorage.setItem('username',JSON.stringify(username))
+            // } else {
+            //     console.error('Login failed:', data.message);
+            // }
         } catch (error) {
             console.error('Login error:', error);
         }

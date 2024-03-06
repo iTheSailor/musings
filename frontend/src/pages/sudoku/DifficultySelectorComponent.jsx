@@ -11,7 +11,7 @@ const DifficultySelector = ({handleClose}) => {
         handleClose: PropTypes.func,
     };
 
-    const [difficulty, setDifficulty] = useState('');
+    const [difficulty, setDifficulty] = useState('easy');
     const navigate = useNavigate();
 
     useEffect (() => {
@@ -29,7 +29,13 @@ const DifficultySelector = ({handleClose}) => {
             }
         }).then((response) => {
             console.log('Game started:', response.data);
-            navigate('/apps/sudoku/game', {state: {puzzle: response.data.puzzle, gameid: response.data.gameid, difficulty: difficulty, userid: localStorage.getItem('userId')}});
+            navigate('/apps/sudoku/game', 
+            {state: {puzzle: response.data.puzzle, 
+                    gameid: response.data.gameid,
+                    time: response.data.time, 
+                    difficulty: response.data.difficulty, 
+                    userid: localStorage.getItem('userId')}});
+     
             handleClose();
         }).catch((error) => {
             console.error('Failed to start game:', error);
@@ -50,6 +56,7 @@ const DifficultySelector = ({handleClose}) => {
             placeholder='Select Difficulty'
             selection
             options={difficultyOptions}
+            defaultValue={difficulty}
             onChange={(e, data) => setDifficulty(data.value)}
         />
         <IsButton

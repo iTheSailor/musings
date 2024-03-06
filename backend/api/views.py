@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
 from . import forecast
 from sudoku.models import Sudoku
@@ -117,7 +118,7 @@ class UserLocationView(APIView):
         location.save()
         return Response({'status': 'success'})
     
-class GenerateSudokuView(APIView):
+class GenerateSudokuView(RetrieveUpdateAPIView):
     def get(self, request, format=None):
         try:
             userid = request.GET['userid']
@@ -127,11 +128,60 @@ class GenerateSudokuView(APIView):
         difficulty = request.GET['difficulty']
         puzzle = sudoku_logic.generate_puzzle(difficulty)
         if puzzle is not None:
-            Sudoku.objects.create(difficulty=difficulty, puzzle=puzzle, player=user)
-            print(puzzle)
-            return Response({'status': 'success', 'puzzle': puzzle})
+            Sudoku.objects.create(
+                difficulty=difficulty, 
+                puzzle=puzzle, 
+                current_state=puzzle, 
+                player=user)
+            game = Sudoku.objects.filter(puzzle=puzzle, player=user).latest('created_at')
+            gamepuzzle = GenerateSudokuView.transform_puzzle(game.current_state)
+            return Response(
+                {'status': 'success', 
+                 'gameid' : game.id, 
+                 'puzzle': gamepuzzle,
+                 'difficulty': game.difficulty,
+                 'time': game.time})
         else:
             return Response({'status': 'failure'})
+        
+    @staticmethod
+    def transform_puzzle(puzzle):
+        transformed_puzzle = []
+        puzzle = puzzle[1:-1]
+        puzzle = puzzle.split('\n')
+        for i in range(len(puzzle)):
+            puzzle[i] = puzzle[i].strip()
+        for row in puzzle:
+            list_row = []
+            row = row[1:-1]
+            row = row.strip('[').strip(']').strip()
+            for i in range(len(row)):
+                if row[i] != ' ':
+                    cell = int(row[i])
+                    list_row.append(cell)
+            transformed_puzzle.append(list_row)
+        return transformed_puzzle
+    
+    @staticmethod
+    def update_sudoku_time(request):
+        data = json.loads(request.body)
+        sudoku_id = data['sudoku_id']
+        time = data['time']
+        sudoku = Sudoku.objects.get(id=sudoku_id)
+        sudoku.time = time
+        sudoku.save()
+        return Response({'status': 'success'})
+        
+class UpdateSudokuTimeView(APIView):
+    def put(self, request, format=None):
+        data = json.loads(request.body)
+        sudoku_id = data['sudoku_id']
+        print(sudoku_id)
+        time = data['time']
+        sudoku = Sudoku.objects.get(id=sudoku_id)
+        sudoku.time = time
+        sudoku.save()
+        return Response({'status': 'success'})
         
 class SolveSudokuView(APIView):
     def post(self, request, format=None):
