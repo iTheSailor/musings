@@ -10,10 +10,11 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from '../utils/AuthContext'; // Ensure this path is correct
 
-const LoginForm = ({ onLoginSuccess }) => {
+const LoginForm = ({ onLoginSuccess, handleClose }) => {
     // Define propTypes right after component declaration
     LoginForm.propTypes = {
         onLoginSuccess: PropTypes.func.isRequired,
+        handleClose: PropTypes.func.isRequired,
     };
 
     const { logIn } = useAuth(); // Use the logIn function from the AuthContext
@@ -53,16 +54,17 @@ const LoginForm = ({ onLoginSuccess }) => {
                 body: JSON.stringify({ username, password }),
             });
             const data = await response.json();
-            // if (response.status ) {
+            if (response.status ) {
                 logIn(data.token); // Log in user
-                // onLoginSuccess(data); // You can keep this if you still need to do something with data on successful login
-                // let userId = data.user_id
-                // localStorage.setItem('userId', JSON.stringify(userId))
-                // let username = data.username
-                // localStorage.setItem('username',JSON.stringify(username))
-            // } else {
-            //     console.error('Login failed:', data.message);
-            // }
+                onLoginSuccess(data); // You can keep this if you still need to do something with data on successful login
+                let userId = data.user_id
+                localStorage.setItem('userId', JSON.stringify(userId))
+                let username = data.username
+                localStorage.setItem('username',JSON.stringify(username))
+                handleClose(); // Close the login form
+            } else {
+                console.error('Login failed:', data.message);
+            }
         } catch (error) {
             console.error('Login error:', error);
         }

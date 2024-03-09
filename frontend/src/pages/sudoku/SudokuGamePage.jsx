@@ -8,18 +8,25 @@ import IsButton from '../../components/IsButton';
 import PausedSudokuBoard from './PausedBoardComponent';
 import SudokuBoard from './BoardComponent';
 import Timer from '../../components/Timer';
+import Cookies from 'js-cookie';
 
 
 const SudokuGame = () => {
     const location = useLocation();
-    const puzzle = location.state ? location.state.puzzle : [];
+    const puzzle = location.state ? location.state.current_state : [];
     const difficulty = location.state ? location.state.difficulty : '';
     const gameid = location.state ? location.state.gameid : '';
     const time = location.state ? location.state.time : 0;
     const user = location.state ? location.state.userid : '';
-
     const [isTimerActive, setIsTimerActive] = useState(true);
     const [timerTime, setTimerTime] = useState(time);
+    const [currentBoard, setCurrentBoard] = useState(puzzle); // Initialize with the initial puzzle.
+    var token = Cookies.get('csrftoken');
+    const handleBoardChange = (newBoard) => {
+        setCurrentBoard(newBoard);
+    };
+
+
 
     const handleTimeChange = (newTime) => {
         setTimerTime(newTime);
@@ -28,9 +35,10 @@ const SudokuGame = () => {
             sudoku_id: gameid,
             time: newTime
         }, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`, 
-                'CSRF-Token': CSRFToken()
+            withCredentials: true,
+            headers: { 
+                'X-CSRFToken': token,
+                'Content-Type': 'application/json',
             }
         }).then((response) => {
             console.log('Time updated:', response.data);
@@ -38,6 +46,28 @@ const SudokuGame = () => {
             console.error('Failed to update time:', error);
         });
     }
+
+    const saveGame = () => {
+        console.log('Save game:', gameid);
+        axios.put(`${process.env.REACT_APP_API_URL}/api/sudoku/saveGame`, {
+            gameid: gameid,
+            userid: user,
+            current_state: currentBoard,
+            time: timerTime
+        }, {
+            withCredentials: true,
+            headers: { 
+                'X-CSRFToken': token,
+                'Content-Type': 'application/json',
+            }
+        }).then((response) => {
+            console.log('Game saved:', response.data);
+        }).catch((error) => {
+            console.error('Failed to save game:', error);
+        });
+    }
+
+    const noop = () => {};
     
 
     const toggleTimer = () => {
@@ -51,7 +81,9 @@ const SudokuGame = () => {
             <IsButton
                 label='Check'
                 color='green'
-                style={{marginBottom: '1em'}}>
+                style={{marginBottom: '1em'}}
+                onClick={noop}
+            >
             </IsButton>
             <IsButton
                 label={isTimerActive ? 'Pause' : 'Resume'}
@@ -62,10 +94,12 @@ const SudokuGame = () => {
                 label='Save Game'
                 color='blue'
                 style={{marginBottom: '1em'}}
+                onClick={saveGame}
             ></IsButton>
             <IsButton
             label="Give Up"
-            color='red'></IsButton>
+            color='red'
+            onClick={noop}></IsButton>
             </Segment>
         <Segment>
             <Grid 
@@ -86,11 +120,12 @@ const SudokuGame = () => {
             <GridColumn>
             </GridColumn>
             <GridColumn align='right'>
-                <Timer isActive={isTimerActive} onTimeChange={handleTimeChange}/>
+                <Timer isActive={isTimerActive} onTimeChange={handleTimeChange} initialTime={timerTime}/>
+                
             </GridColumn>
             </Grid>
             <br />
-            <SudokuBoard puzzle={puzzle} paused={!isTimerActive} />
+            <SudokuBoard current_state={puzzle} paused={!isTimerActive} onBoardChange={handleBoardChange} />
         </Segment>
         </Container>
     );

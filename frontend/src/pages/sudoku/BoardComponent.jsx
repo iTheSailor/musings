@@ -3,53 +3,37 @@ import PropTypes from 'prop-types';
 import SudokuCell from './CellComponent';
 import './Sudoku.css';
 
-const SudokuBoard = ({puzzle, paused}) => {
+const SudokuBoard = ({current_state, paused, onBoardChange}) => {
     SudokuBoard.propTypes = {
-        puzzle: PropTypes.array,
+        current_state: PropTypes.array,
         paused: PropTypes.bool,
+        onBoardChange: PropTypes.func,
     };
     const [board, setBoard] = useState(Array(9).fill().map(() => Array(9).fill({ value: 0, clue: false })));
-    
 
-    const initializeBoard = (puzzleData) => {
-        if(Array.isArray(puzzleData)){
-        const newBoard = puzzleData.map((row, rowIndex) => 
-            row.map((cellValue, colIndex) => ({
-                value: cellValue,
-                clue: cellValue !== 0
+    const initializeBoard = (current_state) => {
+        if(Array.isArray(current_state)){
+        const newBoard = current_state.map((row, rowIndex) => 
+            row.map((cell => ({
+                value: cell.value,
+                clue: cell.clue 
             }))
-        );
+        ));
         setBoard(newBoard);
     }
     };
-
-
-
-
     const handleInputChange = (newValue, rowIndex, colIndex) => {
         if (paused) return;
         const newBoard = [...board];
         newBoard[rowIndex][colIndex].value = newValue;
         setBoard(newBoard);
+        onBoardChange(newBoard);
     };
-
     const noop = () => {};
+    useEffect(() => { 
+        initializeBoard(current_state);
+    }, [current_state]); 
 
-    
-
-
-    useEffect(() => {
-        const puzzleData = [];
-        initializeBoard(puzzleData);
-    }, []); 
-
-    
-
-    useEffect(() => {
-        if (puzzle.length) {
-            initializeBoard(puzzle);
-        }
-    }, [puzzle]);
 
     if (paused) {
         const pausedBoard = () => {

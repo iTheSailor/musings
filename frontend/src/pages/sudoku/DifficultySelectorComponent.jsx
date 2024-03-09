@@ -30,11 +30,11 @@ const DifficultySelector = ({handleClose}) => {
         }).then((response) => {
             console.log('Game started:', response.data);
             navigate('/apps/sudoku/game', 
-            {state: {puzzle: response.data.puzzle, 
-                    gameid: response.data.gameid,
+            {state: {current_state: response.data.transformed_state, 
+                    gameid: response.data.id,
                     time: response.data.time, 
                     difficulty: response.data.difficulty, 
-                    userid: localStorage.getItem('userId')}});
+                    userid: response.data.player.id}});
      
             handleClose();
         }).catch((error) => {

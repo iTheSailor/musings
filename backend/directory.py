@@ -12,6 +12,4 @@ def print_directory_tree(startpath, output_file):
             for file in files:
                 f.write(f"{subindent}{file}\n")
 
-# Replace 'your_directory_path' with the path of the directory you want to inspect.
-# Specify the path for the output text file where the directory tree will be saved.
 print_directory_tree(startpath, output_file)

@@ -65,19 +65,19 @@ const DesktopContainer = ({ children }) => {
               {!loggedIn ? ( // Check if user is not logged in
                 <>
                   <Menu.Item position='right'>
-                    <IsPortal header="Login" label="Login" isInverted>
-                      <LoginForm onLoginSuccess={onLoginSuccess}/>
+                    <IsPortal header="Login" label="Login" >
+                      <LoginForm />
                     </IsPortal>
                   </Menu.Item>
                   <Menu.Item>
-                    <IsPortal header="Signup" label="Signup" isInverted>
-                      <SignupForm onSignupSuccess={onSignupSuccess}/>
+                    <IsPortal header="Signup" label="Signup" >
+                      <SignupForm />
                     </IsPortal>
                   </Menu.Item>
                 </>
               ) : (
                 <Menu.Item position='right'>
-                  <Button onClick={logOut} inverted>Log Out</Button>
+                  <LogOut />
                 </Menu.Item>
               )}
             </Container>

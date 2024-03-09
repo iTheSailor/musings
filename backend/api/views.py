@@ -1,14 +1,13 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
 from . import forecast
-from sudoku.models import Sudoku
+from .models import Sudoku, UserLocation
 from . import sudoku_logic
-from forecast.models import UserLocation
 from django.contrib.auth.models import User
-
+from .serializers import SudokuSerializer
 import json
+from django.http import JsonResponse
 
 class WeatherView(APIView):
     def get(self, request, format=None):
@@ -35,7 +34,7 @@ class WeatherView(APIView):
         geodata = data['geodata']
         country_code = search['country_code']
         timezone = search['timezone']
-        # print(geodata)
+        # 
 
         result = { 'weather': weather, 
                     'address': address, 
@@ -127,43 +126,25 @@ class GenerateSudokuView(RetrieveUpdateAPIView):
             user = None
         difficulty = request.GET['difficulty']
         puzzle = sudoku_logic.generate_puzzle(difficulty)
+        puzzle_list = puzzle.tolist()
         if puzzle is not None:
             Sudoku.objects.create(
                 difficulty=difficulty, 
-                puzzle=puzzle, 
+                puzzle=puzzle_list, 
                 current_state=puzzle, 
                 player=user)
-            game = Sudoku.objects.filter(puzzle=puzzle, player=user).latest('created_at')
-            gamepuzzle = GenerateSudokuView.transform_puzzle(game.current_state)
+            game = Sudoku.objects.filter(puzzle=puzzle_list, player=user).latest('created_at')
+            
             return Response(
                 {'status': 'success', 
                  'gameid' : game.id, 
-                 'puzzle': gamepuzzle,
+                 'puzzle': puzzle_list,
                  'difficulty': game.difficulty,
                  'time': game.time})
         else:
             return Response({'status': 'failure'})
         
-    @staticmethod
-    def transform_puzzle(puzzle):
-        transformed_puzzle = []
-        puzzle = puzzle[1:-1]
-        puzzle = puzzle.split('\n')
-        for i in range(len(puzzle)):
-            puzzle[i] = puzzle[i].strip()
-        for row in puzzle:
-            list_row = []
-            row = row[1:-1]
-            row = row.strip('[').strip(']').strip()
-            for i in range(len(row)):
-                if row[i] != ' ':
-                    cell = int(row[i])
-                    list_row.append(cell)
-            transformed_puzzle.append(list_row)
-        return transformed_puzzle
-    
-    @staticmethod
-    def update_sudoku_time(request):
+    def put(self, request, format=None):
         data = json.loads(request.body)
         sudoku_id = data['sudoku_id']
         time = data['time']
@@ -171,12 +152,59 @@ class GenerateSudokuView(RetrieveUpdateAPIView):
         sudoku.time = time
         sudoku.save()
         return Response({'status': 'success'})
+
+
+def create_sudoku_game(request):
+    data=request.GET
+    print(data)
+    userid = data['userid']
+    difficulty = data['difficulty']
+    pack = {'userid': userid, 'difficulty': difficulty}
+    game = Sudoku.create(pack)
+    if game:
+        serializer = SudokuSerializer(game)
+        return JsonResponse(serializer.data, safe=False)
+    else:
+        return JsonResponse({'error': 'Failed to create game'}, status=404)
+
+    
+def get_user_games(request):
+    userid = request.GET['userid']
+    games = Sudoku.get_user_games(userid)
+    if games:
+        serializer = SudokuSerializer(games, many=True)
+        return JsonResponse(serializer.data, safe=False)  # Convert to JSON and return
+    else:
+        return JsonResponse({'error': 'User not found or no games available'}, status=404)
+
+def delete_game(request):
+    data= json.loads(request.body)
+    gameid = data['gameid']
+    userid = data['userid']
+    
+    deleted = Sudoku.delete_game(gameid, userid)
+    if deleted:
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'failure'}, status=404)
+    
+def save_game(request):
+    data = json.loads(request.body)
+    gameid = data['gameid']
+    current_state = data['current_state']
+    time = data['time']
+    saved = Sudoku.save_game(gameid, current_state, time)
+    if saved:
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'failure'}, status=404)
+
         
 class UpdateSudokuTimeView(APIView):
     def put(self, request, format=None):
         data = json.loads(request.body)
         sudoku_id = data['sudoku_id']
-        print(sudoku_id)
+        
         time = data['time']
         sudoku = Sudoku.objects.get(id=sudoku_id)
         sudoku.time = time

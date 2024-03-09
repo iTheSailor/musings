@@ -4,69 +4,54 @@ import 'semantic-ui-css/semantic.min.css';
 import PropTypes from 'prop-types';
 
 const Timer = ({ initialTime = 0, pauseReset, isActive, toggle, onTimeChange }) => {
-    Timer.propTypes = {
-        initialTime: PropTypes.number,
-        pauseReset: PropTypes.bool,
-        isActive: PropTypes.bool,
-        toggle: PropTypes.func,
-        onTimeChange: PropTypes.func,
-    };
-  const [time, setTime] = useState(initialTime);
+    const [time, setTime] = useState(initialTime);
 
-
-  const reset = () => {
-    setTime(initialTime);
-    if (toggle && isActive) { // Only toggle if isActive to avoid unnecessary calls
-        toggle();
+    useEffect(() => {
+        let timerId;
+        if (isActive) {
+            timerId = setInterval(() => {
+                setTime(time => time + 1);
+            }, 1000);
         }
-    };
-
-  useEffect(() => {
-    const tick = () => {
-        setTime(currentTime => {
-            const newTime = currentTime + 1;
-            onTimeChange(newTime);
-            return newTime;
-        })
-    };
-    if (isActive) {
-        const timerId = setInterval(tick, 1000);
         return () => clearInterval(timerId);
-    }
-  }, [isActive, onTimeChange]);
-
-  useEffect(() => {
-    let interval = null;
-
-    if (isActive) {
-        interval = setInterval(() => {
-            setTime((time) => time + 1);
-        }, 1000);
-    } else {
-        clearInterval(interval);
-    }
-
-    return () => clearInterval(interval);
     }, [isActive]);
 
+    useEffect(() => {
+        onTimeChange(time);
+    }, [time, onTimeChange]);
 
-  return (
-    <>
-      <Label size='large'>
-        <Icon name='clock' /> {time} seconds
-      </Label>
-      {pauseReset &&
-      <Button.Group>
-        <Button toggle active={isActive} onClick={toggle}>
-          {isActive ? 'Pause' : 'Start'}
-        </Button>
-        <Button onClick={reset}>
-          Reset
-        </Button>
-      </Button.Group>
+    const reset = () => {
+        setTime(0); // Reset to 0 or initialTime based on your logic
+        if (toggle && isActive) {
+            toggle();
         }
-    </>
-  );
+    };
+
+    return (
+        <>
+            <Label size='large'>
+                <Icon name='clock' /> {time} seconds
+            </Label>
+            {pauseReset &&
+                <Button.Group>
+                    <Button toggle active={isActive} onClick={toggle}>
+                        {isActive ? 'Pause' : 'Start'}
+                    </Button>
+                    <Button onClick={reset}>
+                        Reset
+                    </Button>
+                </Button.Group>
+            }
+        </>
+    );
+};
+
+Timer.propTypes = {
+    initialTime: PropTypes.number,
+    pauseReset: PropTypes.bool,
+    isActive: PropTypes.bool,
+    toggle: PropTypes.func,
+    onTimeChange: PropTypes.func,
 };
 
 export default Timer;

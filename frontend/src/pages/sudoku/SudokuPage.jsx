@@ -5,6 +5,7 @@ import IsPortal from '../../components/IsPortal';
 import DifficultySelector from './DifficultySelectorComponent';
 import { useState, useEffect } from 'react';
 import { useNavigate} from 'react-router-dom';
+import UserSavedGames from './SavedGamesComponent';
 // import PropTypes from 'prop-types';
 import axios from 'axios';
 // import { useAuth } from '../../utils/AuthContext';
@@ -44,6 +45,7 @@ const SudokuPage = () => {
                                 <IsPortal
                                     label='Continue'
                                     >
+                                    <UserSavedGames />
 
                                 </IsPortal>
                             </Card.Content>
