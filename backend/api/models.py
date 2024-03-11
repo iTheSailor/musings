@@ -163,3 +163,4 @@ class Sudoku(models.Model):
         game.time = time
         game.save()
         return True
+    

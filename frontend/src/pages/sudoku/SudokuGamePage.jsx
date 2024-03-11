@@ -26,11 +26,23 @@ const SudokuGame = () => {
         setCurrentBoard(newBoard);
     };
 
+    const [errors, setErrors] = useState({ rows: [], columns: [], boxes: [] });
+    useEffect(() => {
+        if (errors && (errors.rows.length || errors.columns.length || errors.boxes.length)) {
+            const errorTimeout = setTimeout(() => {
+                // Clear the errors from state here if necessary
+                setErrors({ rows: [], columns: [], boxes: [] });
+            }, 1000);  // Match this duration to your CSS animation
+            
+            return () => clearTimeout(errorTimeout);
+        }
+    }, [errors]);
+    
+
 
 
     const handleTimeChange = (newTime) => {
         setTimerTime(newTime);
-        console.log('Game ID:', gameid);
         axios.put(`${process.env.REACT_APP_API_URL}/api/sudoku/updateTime`, {
             sudoku_id: gameid,
             time: newTime
@@ -40,8 +52,7 @@ const SudokuGame = () => {
                 'X-CSRFToken': token,
                 'Content-Type': 'application/json',
             }
-        }).then((response) => {
-            console.log('Time updated:', response.data);
+            
         }).catch((error) => {
             console.error('Failed to update time:', error);
         });
@@ -67,6 +78,41 @@ const SudokuGame = () => {
         });
     }
 
+    const checkSolution = () => {
+        axios.post(`${process.env.REACT_APP_API_URL}/api/sudoku/checkSolution`, {
+            board: currentBoard  // Adjust with the correct format
+        }, {
+            headers: { 'Content-Type': 'application/json' , 'X-CSRFToken': token},
+            withCredentials: true,
+        }).then(response => {
+            const { status, isCorrect, errors } = response.data;
+            console.log('Response:', response.data);
+            console.log('Status:', status);
+            console.log('Correct:', isCorrect ? 'Yes' : 'No');
+            console.log('Errors:', errors);
+            if (status === 'success') {
+                console.log('Solution checked:', isCorrect);
+ 
+                if (isCorrect){
+                    alert('Congratulations! Correct solution.');
+                }
+                else {
+                    alert('Incorrect solution.');
+                    setErrors(errors);
+                    console.log('Errors:', errors);
+                }
+                // handle game win logic here
+            } else {
+                // Update the state to mark errors
+                  // You would need to create a new state variable for errors
+                console.log('Issue sending')  // Or better, show a user-friendly message within the UI
+            }
+        }).catch(error => {
+            console.error('Error checking solution:', error);
+            // Handle error
+        });
+    };
+
     const noop = () => {};
     
 
@@ -82,7 +128,7 @@ const SudokuGame = () => {
                 label='Check'
                 color='green'
                 style={{marginBottom: '1em'}}
-                onClick={noop}
+                onClick={checkSolution}
             >
             </IsButton>
             <IsButton
@@ -125,7 +171,7 @@ const SudokuGame = () => {
             </GridColumn>
             </Grid>
             <br />
-            <SudokuBoard current_state={puzzle} paused={!isTimerActive} onBoardChange={handleBoardChange} />
+            <SudokuBoard current_state={puzzle} paused={!isTimerActive} onBoardChange={handleBoardChange} errors={errors} />
         </Segment>
         </Container>
     );

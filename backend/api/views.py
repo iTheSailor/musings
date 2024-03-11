@@ -198,6 +198,19 @@ def save_game(request):
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'status': 'failure'}, status=404)
+    
+def check_sudoku_solution(request):
+    data = json.loads(request.body)
+    board = data['board']
+    result = sudoku_logic.check_sudoku_solution(board)
+    is_correct = result[0]
+    errors = result[1]
+    print(is_correct, errors)
+    response = {'is_correct': is_correct, 'errors': errors}
+    if result:
+        return JsonResponse({'status': 'success', 'is_correct': is_correct, 'errors': errors})
+    else:
+        return JsonResponse({'status': 'failure'}, status=404)
 
         
 class UpdateSudokuTimeView(APIView):

@@ -70,6 +70,16 @@
     text-align: center;
     font-size: 20px;
     background-color: rgba(79, 66, 66, 0.929); 
-    color: rgb(255, 255, 255); 
+    color: rgb(255, 255, 255) !important; 
     font-family: 'Arial', sans-serif; 
 }
+@keyframes flashError {
+    0% { color: initial;}
+    50% { color : red; background-color: black;}
+    100% { color: initial;}
+}
+
+.error {
+    animation: flashError 1s ease-out 4;
+}
+

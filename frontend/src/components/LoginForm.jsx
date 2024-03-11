@@ -62,6 +62,7 @@ const LoginForm = ({ onLoginSuccess, handleClose }) => {
                 let username = data.username
                 localStorage.setItem('username',JSON.stringify(username))
                 handleClose(); // Close the login form
+                window.location.reload();
             } else {
                 console.error('Login failed:', data.message);
             }

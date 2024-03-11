@@ -106,3 +106,31 @@ def is_valid_box(board, start_row, start_col):
         for col in range(3):
             numbers.append(board[start_row + row][start_col + col])
     return is_valid_group(numbers)
+
+def check_sudoku_solution(board):
+    errors = {'rows': [], 'columns': [], 'boxes': []}
+    print(board)
+
+    # Convert board to only numbers for validation
+    num_board = [[cell['value'] for cell in row] for row in board]
+
+    # Check each row
+    for i, row in enumerate(num_board):
+        if not is_valid_group(row):
+            errors['rows'].append(i)
+
+    # Check each column
+    for j in range(9):
+        column = [num_board[i][j] for i in range(9)]
+        if not is_valid_group(column):
+            errors['columns'].append(j)
+
+    # Check each 3x3 square
+    for box_row in range(0, 9, 3):
+        for box_col in range(0, 9, 3):
+            if not is_valid_box(num_board, box_row, box_col):
+                errors['boxes'].append((box_row // 3, box_col // 3))
+
+    is_correct = not (errors['rows'] or errors['columns'] or errors['boxes'])
+    print(is_correct, errors)
+    return is_correct, errors

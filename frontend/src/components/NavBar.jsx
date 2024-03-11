@@ -3,7 +3,7 @@ import { Menu, Segment, Button, Container, Icon, Sidebar } from 'semantic-ui-rea
 import { createMedia } from '@artsy/fresnel';
 import PropTypes from 'prop-types';
 import { InView } from 'react-intersection-observer';
-import { useLocation } from 'react-router-dom'; // Import useLocation hook from react-router-dom
+import { Navigate, useLocation } from 'react-router-dom'; // Import useLocation hook from react-router-dom
 import HomepageHeading from '../components/HomepageHeading.jsx'; // Make sure this path is correct
 import NavDropdown from './NavLinks.jsx'; // Make sure this path is correct
 import IsPortal from './IsPortal.jsx'; // Make sure this path is correct
@@ -31,6 +31,7 @@ const onSignupSuccess = (data) => {
 
 const onLogOut = () => {
   localStorage.removeItem('token');
+  window.location.reload();
 };
 
 
@@ -66,18 +67,18 @@ const DesktopContainer = ({ children }) => {
                 <>
                   <Menu.Item position='right'>
                     <IsPortal header="Login" label="Login" >
-                      <LoginForm />
+                      <LoginForm onLoginSuccess={onLoginSuccess}/>
                     </IsPortal>
                   </Menu.Item>
                   <Menu.Item>
                     <IsPortal header="Signup" label="Signup" >
-                      <SignupForm />
+                      <SignupForm onSignupSuccess={onSignupSuccess} />
                     </IsPortal>
                   </Menu.Item>
                 </>
               ) : (
                 <Menu.Item position='right'>
-                  <LogOut />
+                  <LogOut/>
                 </Menu.Item>
               )}
             </Container>
@@ -149,7 +150,7 @@ const MobileContainer = ({ children }) => {
               )}
               {loggedIn && (
                 <Menu.Item position='right'>
-                  <LogOut onLogOut={onLogOut}/>
+                  <LogOut/>
                 </Menu.Item>
               )}
               </Menu>
