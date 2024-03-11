@@ -4,8 +4,6 @@ import './Sudoku.css';
 import { useState, useEffect } from 'react';
 
 const SudokuCell = ({ cell, rowIndex, colIndex, onInputChange, isError }) => {
-
-    const errorClass = isError ? 'error' : '';
     const [showError, setShowError] = useState(false);
     useEffect(() => {
         setShowError(isError);
