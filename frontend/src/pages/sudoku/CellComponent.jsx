@@ -5,9 +5,8 @@ import { useState, useEffect } from 'react';
 
 const SudokuCell = ({ cell, rowIndex, colIndex, onInputChange, isError }) => {
     const [showError, setShowError] = useState(false);
-    useEffect(() => {
+    useEffect(() => {   
         setShowError(isError);
-        // If you want to automatically clear the error after a certain time:
         if (isError) {
             const timer = setTimeout(() => setShowError(false), 2000); // 2 seconds
             return () => clearTimeout(timer);
@@ -18,7 +17,6 @@ const SudokuCell = ({ cell, rowIndex, colIndex, onInputChange, isError }) => {
         const newValue = event.target.value.replace(/[^1-9]/g, '');
         if (newValue.length <= 1) {
             onInputChange(newValue, rowIndex, colIndex);
-            // Clear the error when the user changes the value
             setShowError(false);
         }
     };

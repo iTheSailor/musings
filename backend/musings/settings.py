@@ -58,10 +58,6 @@ INSTALLED_APPS = [
     'fontawesomefree',
     'bootstrap5',
     'widget_tweaks',
-    'main',
-    'todo',
-    'sudoku',
-    'forecast',
     'api',
 ]
 

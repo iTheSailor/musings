@@ -26,17 +26,6 @@ const SudokuGame = () => {
         setCurrentBoard(newBoard);
     };
 
-    const [errors, setErrors] = useState({ rows: [], columns: [], boxes: [] });
-    useEffect(() => {
-        if (errors && (errors.rows.length || errors.columns.length || errors.boxes.length)) {
-            const errorTimeout = setTimeout(() => {
-                // Clear the errors from state here if necessary
-                setErrors({ rows: [], columns: [], boxes: [] });
-            }, 1000);  // Match this duration to your CSS animation
-            
-            return () => clearTimeout(errorTimeout);
-        }
-    }, [errors]);
     
 
 
@@ -78,6 +67,19 @@ const SudokuGame = () => {
         });
     }
 
+
+    const [errors, setErrors] = useState({ rows: [], columns: [], boxes: [] });
+    useEffect(() => {
+        if (errors && (errors.rows.length || errors.columns.length || errors.boxes.length)) {
+            const errorTimeout = setTimeout(() => {
+                // Clear the errors from state here if necessary
+                setErrors({ rows: [], columns: [], boxes: [] });
+            }, 1000);  // Match this duration to your CSS animation
+            
+            return () => clearTimeout(errorTimeout);
+        }
+    }, [errors]);
+
     const checkSolution = () => {
         axios.post(`${process.env.REACT_APP_API_URL}/api/sudoku/checkSolution`, {
             board: currentBoard  // Adjust with the correct format
@@ -103,13 +105,10 @@ const SudokuGame = () => {
                 }
                 // handle game win logic here
             } else {
-                // Update the state to mark errors
-                  // You would need to create a new state variable for errors
-                console.log('Issue sending')  // Or better, show a user-friendly message within the UI
+                console.log('Issue sending')
             }
         }).catch(error => {
             console.error('Error checking solution:', error);
-            // Handle error
         });
     };
 

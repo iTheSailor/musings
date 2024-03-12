@@ -80,6 +80,6 @@
 }
 
 .error {
-    animation: flashError 1s ease-out 4;
+    animation: flashError 1s ease-out infinite;
 }
 

@@ -38,17 +38,17 @@ const SudokuBoard = ({current_state, paused, onBoardChange, errors}) => {
     }, [current_state]); 
 
     const errorsToCellPositions = (errors) => {
-    const errorCells = new Set();
+        var errorCells = new Set();
 
-    // Add cells that are at the intersection of erroneous rows and columns.
-    errors.rows.forEach(rowIndex => {
-        errors.columns.forEach(colIndex => {
-            errorCells.add(`${rowIndex}-${colIndex}`);
+        // Add cells that are at the intersection of erroneous rows and columns.
+        errors.rows.forEach(rowIndex => {
+            errors.columns.forEach(colIndex => {
+                errorCells.add(`${rowIndex}-${colIndex}`);
+            });
         });
-    });
-
-    return errorCells;
-};
+        var errorInstance = errorCells;
+    return errorInstance;
+    };
 
     
     
@@ -61,14 +61,15 @@ const SudokuBoard = ({current_state, paused, onBoardChange, errors}) => {
         console.log('Updating board for errors:', errors);
         console.log('errors!!!!!:', errors);
         // This code should run only if `errors` change.
-        const errorCells = errorsToCellPositions(errors);
+        var errorCells = errorsToCellPositions(errors);
         console.log('errorCells:', errorCells)
         const newBoard = board.map((row, rowIndex) =>
             row.map((cell, colIndex) => {
                 const isError = errorCells.has(`${rowIndex}-${colIndex}`);
-                return { ...cell, error: isError }; // Note: changed from isError to error for consistency
+                return { ...cell, error: isError }; 
             })
         );
+        errorCells = new Set();
         setBoard(newBoard);
     }, [errors]);
     
