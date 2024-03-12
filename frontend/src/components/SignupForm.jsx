@@ -9,13 +9,9 @@ import {
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
+
 const SignupForm = ({onSignupSuccess}) => {
-
-    SignupForm.propTypes = {
-        onSignupSuccess: PropTypes.func.isRequired,
-    };
-
-
+    
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -56,11 +52,15 @@ const SignupForm = ({onSignupSuccess}) => {
                 body: JSON.stringify({ username, email, password }),
             });
             const data = await response.json();
-            if (response.ok) {  
+            if (data.code === 200) {  
                 onSignupSuccess(data);
                 localStorage.setItem('token', data.token);
+                localStorage.setItem('userId', data.user_id);
+                window.location.reload();
             } else {
                 console.error('Signup failed:', data.message);
+                setUsernameError('Username or email is already taken');
+                setEmailError('Username or email is already taken');
             }
         } catch (error) {
             console.error('Signup error:', error);
@@ -76,7 +76,7 @@ const SignupForm = ({onSignupSuccess}) => {
                         label='Username'
                         placeholder='Username'
                         onChange={handleUsernameChange}
-                        error= {usernameError? {content:'Username is required', pointing:'below'} : false}
+                        error= {usernameError? {content: usernameError, pointing:'below'} : false}
                     />
                 </FormField>
                 <FormField>
@@ -84,7 +84,7 @@ const SignupForm = ({onSignupSuccess}) => {
                         label='Email'
                         placeholder='Email'
                         onChange={handleEmailChange}
-                        error= {emailError? {content:'Email is required', pointing:'below'} : false}
+                        error= {emailError? {content: emailError, pointing:'below'} : false}
                     />
                 </FormField>
                 <FormField>
@@ -101,5 +101,12 @@ const SignupForm = ({onSignupSuccess}) => {
         </Segment>
     );
 }
+
+
+SignupForm.propTypes = {
+    onSignupSuccess: PropTypes.func.isRequired,
+};
+
+
 
 export default SignupForm;

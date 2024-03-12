@@ -79,7 +79,7 @@
     100% { color: initial;}
 }
 
-.error {
+.error-cell {
     animation: flashError 1s ease-out infinite;
 }
 

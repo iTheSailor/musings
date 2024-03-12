@@ -9,6 +9,8 @@ from .serializers import SudokuSerializer
 import json
 from django.http import JsonResponse
 
+
+### Weather views
 class WeatherView(APIView):
     def get(self, request, format=None):
         search = json.dumps(request.GET)
@@ -117,6 +119,8 @@ class UserLocationView(APIView):
         location.save()
         return Response({'status': 'success'})
     
+### Sudoku views
+    
 class GenerateSudokuView(RetrieveUpdateAPIView):
     def get(self, request, format=None):
         try:
@@ -205,45 +209,34 @@ def check_sudoku_solution(request):
     result = sudoku_logic.check_sudoku_solution(board)
     is_correct = result[0]
     errors = result[1]
-    print(is_correct, errors)
-    response = {'is_correct': is_correct, 'errors': errors}
     if result:
         return JsonResponse({'status': 'success', 'is_correct': is_correct, 'errors': errors})
     else:
         return JsonResponse({'status': 'failure'}, status=404)
 
-        
-class UpdateSudokuTimeView(APIView):
-    def put(self, request, format=None):
-        data = json.loads(request.body)
-        sudoku_id = data['sudoku_id']
-        
-        time = data['time']
-        sudoku = Sudoku.objects.get(id=sudoku_id)
-        sudoku.time = time
-        sudoku.save()
-        return Response({'status': 'success'})
-        
-class SolveSudokuView(APIView):
-    def post(self, request, format=None):
-        try:
-            data= json.loads(request.body)
-            puzzle = data['puzzle']
-            solution = data['solution']
-            is_correct = sudoku_logic.check_sudoku_board(puzzle, solution)
-            return Response({'status': 'success', 'is_correct': is_correct})
-        except:
-            return Response({'status': 'failure'})
+def give_up(request):
+    data = json.loads(request.body)
+    gameid = data['gameid']
+    game = Sudoku.objects.get(id=gameid)
+    game.is_finished = True
+    game.win = False
+    game.save()
+    return JsonResponse({'status': 'success'})
 
+
+### Authentication views
 class LoginView(APIView):
     def post(self, request, format=None):
         username = request.data['username']
         password = request.data['password']
-        user = User.objects.get(username=username)
-        if user.check_password(password):
-            return Response({'status': 'success', 'username': username, 'user_id': user.id})
-        else:
-            return Response({'status': 'failure'})
+        try:
+            user = User.objects.get(username=username)
+            if user.check_password(password):
+                return Response({'status': 'success', 'username': username, 'user_id': user.id, 'code': 200})
+            else:
+                return Response({'status': 'failure', 'message': 'Invalid password', 'code': 401})
+        except:
+            return Response({'status': 'failure', 'message': 'User not found', 'code': 404})
         
 
 class SignupView(APIView):
@@ -251,6 +244,9 @@ class SignupView(APIView):
         username = request.data['username']
         password = request.data['password']
         email = request.data['email']
-        user = User.objects.create_user(username, email, password)
-        user.save()
-        return Response({'status': 'success', 'username': username})
+        try:
+            user = User.objects.create_user(username, email, password)
+            user.save()
+            return Response({'status': 'success', 'username': username, 'user_id': user.id, 'code': 200})
+        except:
+            return Response({'status': 'failure', 'message': 'User already exists', 'code': 401})

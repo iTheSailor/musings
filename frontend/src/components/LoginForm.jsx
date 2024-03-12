@@ -54,7 +54,7 @@ const LoginForm = ({ onLoginSuccess, handleClose }) => {
                 body: JSON.stringify({ username, password }),
             });
             const data = await response.json();
-            if (response.status ) {
+            if (data.code === 200 ) {
                 logIn(data.token); // Log in user
                 onLoginSuccess(data); // You can keep this if you still need to do something with data on successful login
                 let userId = data.user_id
@@ -64,6 +64,13 @@ const LoginForm = ({ onLoginSuccess, handleClose }) => {
                 handleClose(); // Close the login form
                 window.location.reload();
             } else {
+                if (data.code === 401){
+                    setUsernameError('Invalid username or password');
+                    setPasswordError('Invalid username or password');
+                }
+                if (data.code === 404){
+                    setUsernameError('User not found');
+                }
                 console.error('Login failed:', data.message);
             }
         } catch (error) {
@@ -80,7 +87,7 @@ const LoginForm = ({ onLoginSuccess, handleClose }) => {
                         placeholder='Username'
                         value={username}
                         onChange={handleUsernameChange}
-                        error={usernameError ? {content: 'Username is required', pointing: 'below'} : false}
+                        error={usernameError ? {content: usernameError, pointing: 'below'} : false}
                     />
                 </FormField>
                 <FormField>
@@ -90,7 +97,7 @@ const LoginForm = ({ onLoginSuccess, handleClose }) => {
                         type='password'
                         value={password}
                         onChange={handlePasswordChange}
-                        error={passwordError ? {content: 'Password is required', pointing: 'below'} : false}
+                        error={passwordError ? {content: passwordError, pointing: 'below'} : false}
                     />
                 </FormField>
 

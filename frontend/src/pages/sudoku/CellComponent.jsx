@@ -29,7 +29,7 @@ const SudokuCell = ({ cell, rowIndex, colIndex, onInputChange, isError }) => {
                 type="text"
                 value={cell.value || ''}
                 onChange={handleChange}
-                className={`sudoku-input ${cell.clue ? 'concrete' : ''} ${showError ? 'error' : ''}`}
+                className={`sudoku-input ${cell.clue ? 'concrete' : ''} ${showError ? 'error-cell' : ''}`}
                 disabled={cell.clue}
                 
                 

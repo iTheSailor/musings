@@ -1,7 +1,8 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Segment, Header, Container, Grid, GridColumn } from 'semantic-ui-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import CSRFToken from '../../utils/CsrfToken';
 import IsButton from '../../components/IsButton';
@@ -18,32 +19,65 @@ const SudokuGame = () => {
     const gameid = location.state ? location.state.gameid : '';
     const time = location.state ? location.state.time : 0;
     const user = location.state ? location.state.userid : '';
+    const solution = location.state ? location.state.solution : [];
+    const [showSolution, setShowSolution] = useState(false);
     const [isTimerActive, setIsTimerActive] = useState(true);
     const [timerTime, setTimerTime] = useState(time);
     const [currentBoard, setCurrentBoard] = useState(puzzle); // Initialize with the initial puzzle.
+    const [stop, setStop] = useState(false);
+    const navigate = useNavigate();
     var token = Cookies.get('csrftoken');
+
+
     const handleBoardChange = (newBoard) => {
         setCurrentBoard(newBoard);
     };
 
     
-
-
-
-    const handleTimeChange = (newTime) => {
-        setTimerTime(newTime);
-        axios.put(`${process.env.REACT_APP_API_URL}/api/sudoku/updateTime`, {
-            sudoku_id: gameid,
-            time: newTime
+    const handleGiveUp = () => {
+        setShowSolution(true);
+        setStop(true);
+        setIsTimerActive(false);
+        axios.put(`${process.env.REACT_APP_API_URL}/api/sudoku/giveUp`, {
+            gameid: gameid
         }, {
             withCredentials: true,
             headers: { 
                 'X-CSRFToken': token,
                 'Content-Type': 'application/json',
             }
-            
+        }).then((response) => {
+            console.log('Game given up:', response.data);
         }).catch((error) => {
-            console.error('Failed to update time:', error);
+            console.error('Failed to give up game:', error);
+        });
+    };
+
+    useEffect(() => {
+        if (isTimerActive) {
+            const timerId = setInterval(() => {
+                setTimerTime(timerTime => timerTime + 1);
+            }, 1000);
+            return () => clearInterval(timerId);
+        }
+    }, [isTimerActive]);
+
+
+    const saveTime = () => {
+        // console.log('Save time:', timerTime);
+        axios.put(`${process.env.REACT_APP_API_URL}/api/sudoku/updateTime`, {
+            sudoku_id: gameid,
+            time: timerTime
+        }, {
+            withCredentials: true,
+            headers: { 
+                'X-CSRFToken': token,
+                'Content-Type': 'application/json',
+            }
+        }).then((response) => {
+            // console.log('Time saved:', response.data);
+        }).catch((error) => {
+            console.error('Failed to save time:', error);
         });
     }
 
@@ -112,41 +146,65 @@ const SudokuGame = () => {
         });
     };
 
+    const backToMenu = () => {
+        console.log('Back to menu');
+        navigate('/apps/sudoku');
+
+    }
+
     const noop = () => {};
     
 
     const toggleTimer = () => {
         setIsTimerActive(!isTimerActive);
     }
+
     return (
         <Container style={{display: 'flex', justifyContent:'space-evenly', alignItems: 'center'}}>
         <Segment style={{display:'flex', flexDirection:'column'}}
             >
+           
+            {!showSolution &&
+            <>
             <Header as='h3'>Game Controls</Header>
             <IsButton
-                label='Check'
-                color='green'
-                style={{marginBottom: '1em'}}
-                onClick={checkSolution}
+            label='Check'
+            color='green'
+            style={{marginBottom: '1em'}}
+            onClick={checkSolution}
             >
             </IsButton>
             <IsButton
-                label={isTimerActive ? 'Pause' : 'Resume'}
-                color='grey'
-                style={{marginBottom: '1em'}}
-                onClick={toggleTimer}></IsButton>
+            label={isTimerActive ? 'Pause' : 'Resume'}
+            color='grey'
+            style={{marginBottom: '1em'}}
+            onClick={toggleTimer}></IsButton>
             <IsButton
-                label='Save Game'
-                color='blue'
-                style={{marginBottom: '1em'}}
-                onClick={saveGame}
+            label='Save Game'
+            color='blue'
+            style={{marginBottom: '1em'}}
+            onClick={saveGame}
             ></IsButton>
             <IsButton
             label="Give Up"
             color='red'
-            onClick={noop}></IsButton>
+            onClick={handleGiveUp}></IsButton>
+            </>
+            }
+            {showSolution &&
+            <>
+            <Header as='h3'>Back to Menu</Header>
+            <IsButton
+            label='Back'
+            color='blue'
+            onClick= {backToMenu}
+            ></IsButton>
+            </>
+            }
             </Segment>
         <Segment>
+            {!showSolution &&
+            <>
             <Grid 
             columns={3}
             style={{display: 'flex', 
@@ -155,6 +213,7 @@ const SudokuGame = () => {
             textAlign: 'center'}}
             >
             <GridColumn align='left'>
+                
                 <Header 
                 as='h3' 
                 style={{textTransform:'capitalize'}}
@@ -165,12 +224,45 @@ const SudokuGame = () => {
             <GridColumn>
             </GridColumn>
             <GridColumn align='right'>
-                <Timer isActive={isTimerActive} onTimeChange={handleTimeChange} initialTime={timerTime}/>
+                <Timer isActive={isTimerActive} onStop={stop} onTimeChange={saveTime} initialTime={timerTime}/>
+                
+            </GridColumn>
+            </Grid>
+            <SudokuBoard current_state={puzzle} paused={!isTimerActive} onBoardChange={handleBoardChange} errors={errors}/>
+                </>
+                }
+            <br />
+            {showSolution &&
+            <>
+            <Grid 
+            columns={3}
+            style={{display: 'flex', 
+            justifyContent:'space-evenly', 
+            alignItems: 'center', 
+            textAlign: 'center'}}
+            >
+            <GridColumn align='left'>
+                
+                <Header 
+                as='h3' 
+                style={{textTransform:'capitalize'}}
+                >
+                Game Over - Lost
+                </Header>
+            </GridColumn>
+            <GridColumn>
+            </GridColumn>
+            <GridColumn align='right'>
+                <Timer isActive={isTimerActive} onStop={stop} onTimeChange={saveTime} initialTime={timerTime}/>
                 
             </GridColumn>
             </Grid>
             <br />
-            <SudokuBoard current_state={puzzle} paused={!isTimerActive} onBoardChange={handleBoardChange} errors={errors} />
+
+                <SudokuBoard current_state={puzzle}  onBoardChange={handleBoardChange}  solution={solution} showSolution={showSolution} />
+            </>
+            }
+           
         </Segment>
         </Container>
     );

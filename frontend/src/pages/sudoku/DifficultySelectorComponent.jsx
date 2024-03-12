@@ -31,6 +31,7 @@ const DifficultySelector = ({handleClose}) => {
             console.log('Game started:', response.data);
             navigate('/apps/sudoku/game', 
             {state: {current_state: response.data.transformed_state, 
+                solution: response.data.transformed_solution,
                     gameid: response.data.id,
                     time: response.data.time, 
                     difficulty: response.data.difficulty, 

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import SudokuCell from './CellComponent';
 import './Sudoku.css';
 
-const SudokuBoard = ({current_state, paused, onBoardChange, errors}) => {
+const SudokuBoard = ({current_state, solution, paused, onBoardChange, showSolution, errors}) => {
 
     const [board, setBoard] = useState(Array(9).fill().map(() => Array(9).fill({ value: 0, clue: false })));
 
@@ -33,6 +33,25 @@ const SudokuBoard = ({current_state, paused, onBoardChange, errors}) => {
     };
     const noop = () => {};
 
+    useEffect(() => {
+        if (showSolution) {
+            const newBoard = current_state.map((row, rowIndex) =>
+                row.map((cell, colIndex) => {
+                    // Replace the cell's value with the solution, but only for non-clue cells
+                    if (!cell.clue) {
+                        return { ...cell, value: solution[rowIndex][colIndex] };
+                    }
+                    return cell;
+                })
+            );
+            setBoard(newBoard);
+            if (onBoardChange) {
+                onBoardChange(newBoard);
+            }
+            
+        }
+    }, [showSolution, solution, current_state, onBoardChange]);
+    
     useEffect(() => { 
         initializeBoard(current_state);
     }, [current_state]); 
@@ -131,8 +150,10 @@ const SudokuBoard = ({current_state, paused, onBoardChange, errors}) => {
 
 SudokuBoard.propTypes = {
     current_state: PropTypes.array,
+    solution: PropTypes.array,
     paused: PropTypes.bool,
     onBoardChange: PropTypes.func,
+    showSolution: PropTypes.bool,
     errors: PropTypes.shape({ // Use PropTypes.shape for better structuring
         rows: PropTypes.arrayOf(PropTypes.number),
         columns: PropTypes.arrayOf(PropTypes.number),

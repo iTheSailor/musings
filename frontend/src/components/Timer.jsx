@@ -3,7 +3,7 @@ import { Button, Icon, Label } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import PropTypes from 'prop-types';
 
-const Timer = ({ initialTime = 0, pauseReset, isActive, toggle, onTimeChange }) => {
+const Timer = ({ initialTime = 0, pauseReset, isActive, toggle, onTimeChange, onStop}) => {
     const [time, setTime] = useState(initialTime);
 
     useEffect(() => {
@@ -17,8 +17,20 @@ const Timer = ({ initialTime = 0, pauseReset, isActive, toggle, onTimeChange }) 
     }, [isActive]);
 
     useEffect(() => {
-        onTimeChange(time);
-    }, [time, onTimeChange]);
+        if (onTimeChange) {
+            onTimeChange(time);
+        }
+    }
+    , [time, onTimeChange]);
+
+    useEffect(() => {
+        if (onStop) {
+            isActive = false;
+        }
+    }
+    , [time, onStop, isActive]);
+
+
 
     const reset = () => {
         setTime(0); // Reset to 0 or initialTime based on your logic
@@ -52,6 +64,7 @@ Timer.propTypes = {
     isActive: PropTypes.bool,
     toggle: PropTypes.func,
     onTimeChange: PropTypes.func,
+    onStop: PropTypes.bool
 };
 
 export default Timer;

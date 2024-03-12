@@ -49,6 +49,7 @@ const UserSavedGames = () => {
         console.log('Current State:', selectedGame.transformed_state)
         navigate('/apps/sudoku/game', 
         {state: {current_state: selectedGame.transformed_state, 
+            solution: selectedGame.transformed_solution,
                 gameid: selectedGame.id,
                 time: selectedGame.time, 
                 difficulty: selectedGame.difficulty, 

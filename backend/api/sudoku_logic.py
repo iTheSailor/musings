@@ -61,7 +61,7 @@ def generate_puzzle(difficulty):
         clues = 20
     if solution_board is not None:
         board = remove_numbers_to_create_puzzle(solution_board.tolist(), clues)
-        return board
+        return board, solution_board
 
 def remove_numbers_to_create_puzzle(board, clues):
     puzzle_board = np.copy(board)

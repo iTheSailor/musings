@@ -29,6 +29,7 @@ class Sudoku(models.Model):
     player = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='api_sudoku_games')
     puzzle = models.TextField()
     current_state = models.TextField()
+    solution = models.TextField(blank=True, null=True)
     difficulty = models.CharField(max_length=10)
     time = models.IntegerField(default=0)
     is_finished = models.BooleanField(default=False)
@@ -44,13 +45,16 @@ class Sudoku(models.Model):
         difficulty = args[0]['difficulty']
         user = User.objects.get(id=userid)
         print(user, difficulty, userid)
-        puzzle = sudoku_logic.generate_puzzle(difficulty)
+        puzzle_pair = sudoku_logic.generate_puzzle(difficulty)
+        puzzle = puzzle_pair[0]
+        solution = puzzle_pair[1]
         puzzle_list = puzzle.tolist()
         current_state = self.transform_current_state_to_dict(puzzle_list)
         if puzzle is not None:
             Sudoku.objects.create(
                 difficulty=difficulty, 
                 puzzle=puzzle_list, 
+                solution=solution.tolist(),
                 current_state=current_state, 
                 player=user)
             game = Sudoku.objects.filter(puzzle=puzzle_list, player=user).latest('created_at')
@@ -70,6 +74,8 @@ class Sudoku(models.Model):
             self.puzzle = json.dumps(self.puzzle)
         if isinstance(self.current_state, list):
             self.current_state = json.dumps(self.current_state)
+        if isinstance(self.solution, list):
+            self.solution = json.dumps(self.solution)
         super().save(*args, **kwargs)
 
     def load_current_state(self):
@@ -116,29 +122,14 @@ class Sudoku(models.Model):
     def transform_current_state_to_dict(current_state):
         print(current_state)
         print(type(current_state))
-        # Assuming current_state is stored as a string similar to puzzle but needs
-        # conversion to a list of lists format with value and clue indicators.
         transformed_state = []
-        # Split the string into lines representing rows; adjust based on actual storage format
-
         for row in current_state:
             new_row = []
             for value in row:
-                # Assuming format of each cell is 'value:clue' where clue is a boolean
-                # Adjust parsing based on your actual storage format
-
-                # Convert values to integers, or keep as empty if value is '0' or empty
                 cell = {'value': value, 'clue': value != 0}
                 new_row.append(cell)
             transformed_state.append(new_row)
         return transformed_state
-
-   
-
-
-
-
-        
     
     @staticmethod
     def delete_game(gameid, userid):
