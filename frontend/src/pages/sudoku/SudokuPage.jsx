@@ -1,21 +1,14 @@
 import React from 'react';
 import { Container, Header, Segment, Card, Grid, Divider } from 'semantic-ui-react';
-import IsButton from '../../components/IsButton';
 import IsPortal from '../../components/IsPortal';
 import DifficultySelector from './DifficultySelectorComponent';
-import { useState, useEffect } from 'react';
-import { useNavigate} from 'react-router-dom';
 import UserSavedGames from './SavedGamesComponent';
-// import PropTypes from 'prop-types';
-import axios from 'axios';
-// import { useAuth } from '../../utils/AuthContext';
 
 
 const SudokuPage = () => {
-    
-
     return (
         <Container>
+            <br />
             <Header as='h1'>Sudoku</Header>
             <Segment style={{ padding: '2em 2em', margin: '2em'}}>
                 <Grid columns={2} relaxed='very'>

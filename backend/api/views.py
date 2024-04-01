@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
 from . import forecast
-from .models import Sudoku, UserLocation
+from .models import Sudoku, UserLocation, TodoItem
 from . import sudoku_logic
 from django.contrib.auth.models import User
 from .serializers import SudokuSerializer
@@ -222,6 +222,47 @@ def give_up(request):
     game.win = False
     game.save()
     return JsonResponse({'status': 'success'})
+
+
+### Todo views
+
+class TodoView(APIView):
+    def get(self, request, format=None):
+        user_id = request.GET['user']
+        user = User.objects.get(id=user_id)
+        todos = TodoItem.objects.filter(user=user)
+        todo_list = []
+        for todo in todos:
+            todo_list.append({
+                'id': todo.id,
+                'title': todo.title,
+                'description': todo.description,
+                'completed': todo.completed
+            })
+        return Response(todo_list)
+    
+    def post(self, request, format=None):
+        user_id = request.data['user']
+        user = User.objects.get(id=user_id)
+        title = request.data['title']
+        description = request.data['description']
+        todo = TodoItem(user=user, title=title, description=description)
+        todo.save()
+        return Response({'status': 'success'})
+    
+    def put(self, request, format=None):
+        todo_id = request.data['todo_id']
+        todo = TodoItem.objects.get(id=todo_id)
+        todo.completed = not todo.completed
+        todo.save()
+        return Response({'status': 'success'})
+    
+    def delete(self, request, format=None):
+        todo_id = request.data['todo_id']
+        todo = TodoItem.objects.get(id=todo_id)
+        todo.delete()
+        return Response({'status': 'success'})
+    
 
 
 ### Authentication views

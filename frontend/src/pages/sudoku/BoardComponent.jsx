@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import SudokuCell from './CellComponent';
 import './Sudoku.css';
 
-const SudokuBoard = ({current_state, solution, paused, onBoardChange, showSolution, errors}) => {
+const SudokuBoard = ({current_state, paused, onBoardChange, showSolution, errors}) => {
 
     const [board, setBoard] = useState(Array(9).fill().map(() => Array(9).fill({ value: 0, clue: false })));
 
@@ -33,24 +33,6 @@ const SudokuBoard = ({current_state, solution, paused, onBoardChange, showSoluti
     };
     const noop = () => {};
 
-    useEffect(() => {
-        if (showSolution) {
-            const newBoard = current_state.map((row, rowIndex) =>
-                row.map((cell, colIndex) => {
-                    // Replace the cell's value with the solution, but only for non-clue cells
-                    if (!cell.clue) {
-                        return { ...cell, value: solution[rowIndex][colIndex] };
-                    }
-                    return cell;
-                })
-            );
-            setBoard(newBoard);
-            if (onBoardChange) {
-                onBoardChange(newBoard);
-            }
-            
-        }
-    }, [showSolution, solution, current_state, onBoardChange]);
     
     useEffect(() => { 
         initializeBoard(current_state);
@@ -91,62 +73,39 @@ const SudokuBoard = ({current_state, solution, paused, onBoardChange, showSoluti
         errorCells = new Set();
         setBoard(newBoard);
     }, [errors]);
-    
-
-    if (paused) {
-        const pausedBoard = () => {
-            const gridSize = 9; // for a standard Sudoku board
-            let board = [];
-            for (let row = 0; row < gridSize; row++) {
-                let currentRow = [];
-                for (let col = 0; col < gridSize; col++) {
-                    // Insert 'SUDOKU' letters into the middle row
-                    let cellContent = row === 4 ? '数独-SUDOKU'[col] || '' : Math.ceil(Math.random() * 9);
-                    currentRow.push(
-                        <SudokuCell
-                            key={`${row}-${col}`}
-                            cell={{ value: cellContent, clue: row === 4 ? false : true}}
-                            rowIndex={row}
-                            colIndex={col}
-                            onInputChange={noop}
-                            
-                            ></SudokuCell>
-                    );
-                }
-                board.push(<div style={{ display: 'flex' }}>{currentRow}</div>);
-            }
-            return board;
-        }
-        return (
-            <div id="sudokuBoard" className="sudoku-board">
-                {pausedBoard()}
-            </div>
-        );
-    } else {
-
-    
 
     return (
-        <div id="sudokuBoard" className="sudoku-board">
-            {board.map((row, rowIndex) => (
-                <div key={rowIndex} className="sudoku-row">
-                    {row.map((cell, colIndex) => (
-                        <SudokuCell
-                            key={`${rowIndex}-${colIndex}`}
-                            cell={cell}
-                            rowIndex={rowIndex}
-                            colIndex={colIndex}
-                            onInputChange={handleInputChange}
-                            isError={cell.error}
-                            
-                        />
-                    ))}
-                </div>
-            ))}
-        </div>
+        <>
+        <br />
+        {!paused &&
+            <>
+            <div id="sudokuBoard" className="sudoku-board">
+                {board.map((row, rowIndex) => (
+                    <div key={rowIndex} className="sudoku-row">
+                        {row.map((cell, colIndex) => (
+                            <SudokuCell
+                                key={`${rowIndex}-${colIndex}`}
+                                cell={cell}
+                                rowIndex={rowIndex}
+                                colIndex={colIndex}
+                                onInputChange={handleInputChange}
+                                isError={cell.error}
+                                
+                            />
+                        ))}
+                    </div>
+                ))}
+            </div>
+        </>}
+        {paused && 
+            <>
+            <pausedBoard />
+            </>
+        }
+    </>
     );
 }
-}
+
 
 SudokuBoard.propTypes = {
     current_state: PropTypes.array,

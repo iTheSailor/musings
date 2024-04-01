@@ -44,7 +44,7 @@ const IsPortal = ({ header, children, label, isInverted = false, color }) => {
             style={{
               position: "fixed",
               // Keep it fixed so it stays in place even if the page is scrolled
-              top: 0,
+              top: "25%",
               // Align the top of the segment with the top of the viewport
               left: "50%",
               // Center the segment horizontally

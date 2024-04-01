@@ -17,7 +17,7 @@ const NavDropdown = () => (
         <DropdownHeader>Apps</DropdownHeader>
         <DropdownItem href='/apps/forecast'>Forecast</DropdownItem>
         <DropdownItem href='/apps/sudoku'>Sudoku</DropdownItem>
-        <DropdownItem href='/apps/to-do'>To-Do List</DropdownItem>
+        <DropdownItem href='/apps/todo'>To-Do List</DropdownItem>
         <DropdownDivider />
         <DropdownHeader>Docs</DropdownHeader>
         <DropdownItem>Forecast</DropdownItem>
