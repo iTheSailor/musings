@@ -13,7 +13,9 @@ urlpatterns = [
     path('sudoku/deleteGame', views.delete_game, name='deleteGame'),
     path('sudoku/saveGame', views.save_game, name='saveGame'),
 
-    path('todo', views.TodoView.as_view(), name='todo'),
+    path('todo/', views.TodoView.as_view(), name='todo'),
+    # path('todo/delete', views.delete_todo_item, name='deleteTodo'),
+    
 
     path('login', views.LoginView.as_view(), name='login'),
     path('signup', views.SignupView.as_view(), name='signup'),

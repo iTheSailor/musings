@@ -10,15 +10,16 @@ import {
   Icon,
 } from "semantic-ui-react";
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const IsPortal = ({ header, children, label, isInverted = false, color }) => {
+const IsPortal = ({ header, children, label, isInverted = false, color, auxHook }) => {
   IsPortal.propTypes = {
     header: PropTypes.string.isRequired,
     children: PropTypes.node.isRequired,
     label: PropTypes.string.isRequired,
     isInverted: PropTypes.bool,
     color: PropTypes.string,
+    auxHook: PropTypes.bool,
   };
 
   const [open, setOpen] = useState(false);
@@ -27,6 +28,11 @@ const IsPortal = ({ header, children, label, isInverted = false, color }) => {
   const enhancedChildren = React.Children.map(children, (child) =>
     React.cloneElement(child, { handleClose })
   );
+  useEffect(() => {
+    if(auxHook){
+      handleClose()
+    }
+  })
 
   return (
     <Grid>

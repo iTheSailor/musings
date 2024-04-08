@@ -12,7 +12,7 @@ const IsButton = ({ label, onClick, color, style }) => {
 
 IsButton.propTypes = {
     label: PropTypes.string.isRequired,
-    onClick: PropTypes.func.isRequired,
+    onClick: PropTypes.func,
     color: PropTypes.string,
     style: PropTypes.object,
     };

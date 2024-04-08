@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
+from rest_framework import permissions
 from . import forecast
 from .models import Sudoku, UserLocation, TodoItem
 from . import sudoku_logic
@@ -8,6 +9,7 @@ from django.contrib.auth.models import User
 from .serializers import SudokuSerializer
 import json
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 
 
 ### Weather views
@@ -226,7 +228,7 @@ def give_up(request):
 
 ### Todo views
 
-class TodoView(APIView):
+class TodoView(APIView): 
     def get(self, request, format=None):
         user_id = request.GET['user']
         user = User.objects.get(id=user_id)
@@ -242,11 +244,18 @@ class TodoView(APIView):
         return Response(todo_list)
     
     def post(self, request, format=None):
-        user_id = request.data['user']
+        print(request)
+        data = json.loads(request.body)
+        print(data)
+        user_id = data['user']
+        title = data['title']
+        description = data['description']
+        completed = 0
+        print(user_id, title, description)
         user = User.objects.get(id=user_id)
-        title = request.data['title']
-        description = request.data['description']
-        todo = TodoItem(user=user, title=title, description=description)
+        
+        
+        todo = TodoItem(user=user, title=title, description=description, completed=completed)
         todo.save()
         return Response({'status': 'success'})
     
@@ -257,12 +266,24 @@ class TodoView(APIView):
         todo.save()
         return Response({'status': 'success'})
     
+    def patch(self, request, format=None):
+        todo_id = request.data['todo_id']
+        title = request.data['title']
+        description = request.data['description']
+        completed = request.data['completed']
+        todo = TodoItem.objects.get(id=todo_id)
+        todo.title = title
+        todo.description = description
+        todo.completed = completed
+        todo.save()
+        return Response({'status': 'success'})
+
     def delete(self, request, format=None):
         todo_id = request.data['todo_id']
-        todo = TodoItem.objects.get(id=todo_id)
+        user_id = request.data['user']
+        todo = TodoItem.objects.get(id=todo_id, user=user_id)
         todo.delete()
         return Response({'status': 'success'})
-    
 
 
 ### Authentication views
