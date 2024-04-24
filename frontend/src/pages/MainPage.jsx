@@ -9,8 +9,20 @@ import {
   Image,
   Segment,
 } from "semantic-ui-react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-const MainPage = () => (
+const MainPage = () => {
+  var [image, setImage] = useState(null);
+  
+  useEffect(() => {
+    axios.get("http://127.0.0.1:8000/api/images/", 
+    { withCredentials: false}).then((res) => {
+      setImage(res.data[0]);
+      console.log(res.data[0]);
+    });
+  }, []);
+  return(
   <>
     <Container style={{ height: "26rem" }}></Container>
 
@@ -56,7 +68,7 @@ const MainPage = () => (
               bordered
               rounded
               size="large"
-              src="/images/wireframe/white-image.png"
+              src={image}
             />
           </Grid.Column>
         </Grid.Row>
@@ -130,5 +142,6 @@ const MainPage = () => (
     </Segment>
   </>
 );
+};
 
 export default MainPage;

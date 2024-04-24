@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from rest_framework import routers
+
 
 urlpatterns = [
     path('weather', views.WeatherView.as_view(), name='weather'),
@@ -15,9 +17,12 @@ urlpatterns = [
 
     path('todo/', views.TodoView.as_view(), name='todo'),
     # path('todo/delete', views.delete_todo_item, name='deleteTodo'),
-    
 
     path('login', views.LoginView.as_view(), name='login'),
     path('signup', views.SignupView.as_view(), name='signup'),
 ]
 
+router = routers.DefaultRouter()
+router.register(r'images', views.ImageModelViewSet, basename='images')
+
+urlpatterns += router.urls

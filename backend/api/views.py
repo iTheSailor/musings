@@ -1,16 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
-from rest_framework import permissions
+from rest_framework import permissions, viewsets
 from . import forecast
-from .models import Sudoku, UserLocation, TodoItem
+from .models import Sudoku, UserLocation, TodoItem, Image
 from . import sudoku_logic
 from django.contrib.auth.models import User
-from .serializers import SudokuSerializer
+from .serializers import SudokuSerializer, TodoItemSerializer, ImageSerializer
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
-
+from icecream import ic
 
 ### Weather views
 class WeatherView(APIView):
@@ -230,10 +230,17 @@ def give_up(request):
 
 class TodoView(APIView): 
     def get(self, request, format=None):
-        user_id = request.GET['user']
-        user = User.objects.get(id=user_id)
-        todos = TodoItem.objects.filter(user=user)
+        ic(request.GET)
+        if 'user' in request.GET:
+            user_id = request.GET['user']
+            user = User.objects.get(id=user_id)
+        else:
+            user_id = None
+            user = None
+        todos = TodoItem.objects.filter(user=user, completed=False)
+        completed_todos = TodoItem.objects.filter(user=user, completed=True)
         todo_list = []
+        finished_list = []
         for todo in todos:
             todo_list.append({
                 'id': todo.id,
@@ -241,6 +248,14 @@ class TodoView(APIView):
                 'description': todo.description,
                 'completed': todo.completed
             })
+        for todo in completed_todos:
+            finished_list.append({
+                'id': todo.id,
+                'title': todo.title,
+                'description': todo.description,
+                'completed': todo.completed
+            })
+        todo_list = {'todos': todo_list, 'completed': finished_list}
         return Response(todo_list)
     
     def post(self, request, format=None):
@@ -251,10 +266,11 @@ class TodoView(APIView):
         title = data['title']
         description = data['description']
         completed = 0
-        print(user_id, title, description)
-        user = User.objects.get(id=user_id)
-        
-        
+        ic(user_id, title, description)
+        if user_id:
+            user = User.objects.get(id=user_id) 
+        else:
+            user = None 
         todo = TodoItem(user=user, title=title, description=description, completed=completed)
         todo.save()
         return Response({'status': 'success'})
@@ -312,3 +328,7 @@ class SignupView(APIView):
             return Response({'status': 'success', 'username': username, 'user_id': user.id, 'code': 200})
         except:
             return Response({'status': 'failure', 'message': 'User already exists', 'code': 401})
+        
+class ImageModelViewSet(viewsets.ModelViewSet):
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer

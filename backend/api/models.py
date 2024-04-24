@@ -167,3 +167,8 @@ class TodoItem(models.Model):
     def __str__(self):
         return self.title
     
+class Image(models.Model):
+    title = models.CharField(max_length=256)
+    image = models.ImageField(upload_to='images/')
+
+    
