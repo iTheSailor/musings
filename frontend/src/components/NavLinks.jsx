@@ -25,8 +25,8 @@ const NavDropdown = () => (
         <DropdownItem>To-Do List</DropdownItem>
       </DropdownMenu>
     </Dropdown>
-    <MenuItem>Forums</MenuItem>
-    <MenuItem>Contact Us</MenuItem>
+    <MenuItem className='link item' href='/portfolio'>Portfolio</MenuItem>
+    <MenuItem className='link item' href='/contact'>Contact Me</MenuItem>
     </>
 )
 

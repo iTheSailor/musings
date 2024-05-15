@@ -11,17 +11,9 @@ import {
 } from "semantic-ui-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import me1 from "../images/me1.jpeg";
 
 const MainPage = () => {
-  var [image, setImage] = useState(null);
-  
-  useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/images/", 
-    { withCredentials: false}).then((res) => {
-      setImage(res.data[0]);
-      console.log(res.data[0]);
-    });
-  }, []);
   return(
   <>
     <Container style={{ height: "26rem" }}></Container>
@@ -41,8 +33,11 @@ const MainPage = () => {
                 <List.Item >Python</List.Item>
                 <List.Item >Postgres</List.Item>
                 <List.Item >JavaScript</List.Item>
+                <List.Item >Node.js</List.Item>
                 <List.Item >React</List.Item>
-                <List.Item >Redux</List.Item>
+                <List.Item >Django</List.Item>
+                <List.Item >Linux Systems</List.Item>
+                <List.Item >Git</List.Item>
             </List>
             <Header
               as="h3"
@@ -58,24 +53,20 @@ const MainPage = () => {
                 <List.Item >Machine Learning</List.Item>
                 <List.Item >Artificial Intelligence</List.Item>
             </List>
-            <List>
-
+            <List horizontal>
                 <List.Item >Cloud Computing</List.Item>
+                <List.Item >Cybersecurity</List.Item>
+                <List.Item >Automation</List.Item>
+                <List.Item >Software as a Service</List.Item>
             </List>
           </Grid.Column>
           <Grid.Column floated="right" width={6}>
             <Image
               bordered
               rounded
-              size="large"
-              src={image}
+              size="huge"
+              src={me1}
             />
-          </Grid.Column>
-        </Grid.Row>
-
-        <Grid.Row>
-          <Grid.Column textAlign="center">
-            <Button size="huge">Check Them Out</Button>
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -86,19 +77,22 @@ const MainPage = () => {
         <Grid.Row textAlign="center">
           <Grid.Column style={{ paddingBottom: "5em", paddingTop: "5em" }}>
             <Header as="h3" style={{ fontSize: "2em" }}>
-              What a Company
+              Analytical Thinker
             </Header>
             <p style={{ fontSize: "1.33em" }}>
-              That is what they all say about us
+              I am a highly analytical thinker and a problem solver. I enjoy
+              breaking down complex problems into smaller, more manageable
+              components.
             </p>
           </Grid.Column>
           <Grid.Column style={{ paddingBottom: "5em", paddingTop: "5em" }}>
             <Header as="h3" style={{ fontSize: "2em" }}>
-              I shouldnt have gone with their competitor.
+              Expert Communicator
             </Header>
             <p style={{ fontSize: "1.33em" }}>
-              <Image avatar src="/images/avatar/large/nan.jpg" />
-              <b>Nan</b> Chief Fun Officer Acme Toys
+              I am an expert communicator with a strong background in public
+              speaking, writing, and interpersonal communication. I am able to
+              convey complex ideas in a clear and concise manner.
             </p>
           </Grid.Column>
         </Grid.Row>
@@ -108,16 +102,17 @@ const MainPage = () => {
     <Segment style={{ padding: "8em 0em" }} vertical>
       <Container text>
         <Header as="h3" style={{ fontSize: "2em" }}>
-          Breaking The Grid, Grabs Your Attention
+          What Am I Currently Working On?
         </Header>
         <p style={{ fontSize: "1.33em" }}>
-          Instead of on content creation and hard work, we have learned how to
-          master the art of doing nothing by providing massive amounts of
-          whitespace and generic content that can seem massive, monolithic and
-          worth your attention.
+          I am currently working on a number of projects, including a full stack
+          web application, a data science project, and a machine learning
+          project. I am always looking for new and exciting projects to work on,
+          so if you have an idea, feel free to reach out! You can see samples of
+          my work on and what I am currently working on on my portfolio page. 
         </p>
         <Button as="a" size="large">
-          Read More
+          Portfolio Page
         </Button>
 
         <Divider
@@ -128,15 +123,16 @@ const MainPage = () => {
         ></Divider>
 
         <Header as="h3" style={{ fontSize: "2em" }}>
-          Did We Tell You About Our Bananas?
+          Want To See My Resume?
         </Header>
         <p style={{ fontSize: "1.33em" }}>
-          Yes I know you probably disregarded the earlier boasts as non-sequitur
-          filler content, but its really true. It took years of gene splicing
-          and combinatory DNA research, but our bananas can really dance.
+          If you would like to see my resume, you can download a copy by clicking
+          the button below. My resume includes information about my education,
+          work experience, and skills. If you have any questions about my resume,
+          feel free to reach out!
         </p>
         <Button as="a" size="large">
-          Im Still Quite Interested
+          Download Resume
         </Button>
       </Container>
     </Segment>
