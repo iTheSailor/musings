@@ -63,11 +63,6 @@ class Sudoku(models.Model):
             print('Failed to create game')
             return None
         
-
-
-
-
-
     def save(self, *args, **kwargs):
         # If puzzle or current_state is a Python list (or other structure), convert to JSON string before saving
         if isinstance(self.puzzle, list):
@@ -171,4 +166,14 @@ class Image(models.Model):
     title = models.CharField(max_length=256)
     image = models.ImageField(upload_to='images/')
 
+class PortfolioItem(models.Model):
+    title = models.CharField(max_length=256)
+    description = models.TextField()
+    image = models.ImageField(upload_to='images/', blank=True)
+    technology = models.CharField(max_length=256)
+    created = models.DateField(auto_now_add=True)
+    updated = models.DateField(auto_now=True)
+    
+    def __str__(self):
+        return self.title
     

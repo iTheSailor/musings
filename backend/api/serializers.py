@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Sudoku, TodoItem, Image
+from .models import Sudoku, TodoItem, Image, PortfolioItem
 import json
 
 class SudokuSerializer(serializers.ModelSerializer):
@@ -40,3 +40,8 @@ class ImageSerializer(serializers.ModelSerializer):
         model = Image
         fields = ['id', 'title', 'image']
 
+class PortfolioItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PortfolioItem
+        fields = ['id', 'title', 'description', 'image', 'technology', 'created', 'updated']
+        depth = 1

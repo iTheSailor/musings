@@ -18,6 +18,11 @@ urlpatterns = [
     path('todo/', views.TodoView.as_view(), name='todo'),
     # path('todo/delete', views.delete_todo_item, name='deleteTodo'),
 
+    path('portfolio/', views.PortfolioItemView, name='portfolio'),
+    path('portfolio/create', views.PortfolioItemCreate, name='portfolioCreate'),
+    path('portfolio/update/<int:id>', views.PortfolioItemEdit, name='portfolioUpdate'),
+    path('portfolio/delete/<int:id>', views.PortfolioItemDelete, name='portfolioDelete'),
+
     path('login', views.LoginView.as_view(), name='login'),
     path('signup', views.SignupView.as_view(), name='signup'),
 ]

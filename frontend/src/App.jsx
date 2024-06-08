@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import ForecastPage from './pages/forecast/ForecastPage';
 import SudokuPage from './pages/sudoku/SudokuPage';
 import SudokuGame from './pages/sudoku/SudokuGamePage';
+import PortfolioPage from './pages/portfolio/PortfolioPage';
 import TodoPage from './pages/todo/TodoPage';
 import MainPage from './pages/MainPage';
 import NavBar from './components/NavBar';
@@ -19,6 +20,7 @@ const BaseLayout = () => (
         <Route path="/apps/sudoku" element={<SudokuPage />} />
         <Route path="/apps/sudoku/game" element={<SudokuGame />} />
         <Route path="/apps/todo" element={<TodoPage />} />
+        <Route path="/portfolio" element={<PortfolioPage />} />
 
       </Routes>
     </Container>

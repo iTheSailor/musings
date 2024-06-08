@@ -3,10 +3,10 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework import permissions, viewsets
 from . import forecast
-from .models import Sudoku, UserLocation, TodoItem, Image
+from .models import Sudoku, UserLocation, TodoItem, Image, PortfolioItem
 from . import sudoku_logic
 from django.contrib.auth.models import User
-from .serializers import SudokuSerializer, TodoItemSerializer, ImageSerializer
+from .serializers import SudokuSerializer, TodoItemSerializer, ImageSerializer, PortfolioItemSerializer
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -332,3 +332,39 @@ class SignupView(APIView):
 class ImageModelViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
+@csrf_exempt
+def PortfolioItemCreate(request):
+    data = json.loads(request.body)
+    title = data['title']
+    description = data['description']
+    image = data['image']
+    technology = data['technology']
+    item = PortfolioItem(title=title, description=description, image=image, technology=technology)
+    item.save()
+    return JsonResponse({'status': 'success'})
+
+def PortfolioItemView(request):
+    context = {'request': request}
+    items = PortfolioItem.objects.all()
+    serializer = PortfolioItemSerializer(items, many=True, context=context)
+    return JsonResponse(serializer.data, safe=False)
+
+def SinglePortfolioItem(request, id):
+    item = PortfolioItem.objects.get(id=id)
+    serializer = PortfolioItemSerializer(item)
+    return JsonResponse(serializer.data, safe=False)
+
+def PortfolioItemEdit(request, id):
+    data = json.loads(request.body)
+    item = PortfolioItem.objects.get(id=id)
+    item.title = data['title']
+    item.description = data['description']
+    item.image = data['image']
+    item.technology = data['technology']
+    item.save()
+    return JsonResponse({'status': 'success'})
+
+def PortfolioItemDelete(request, id):
+    item = PortfolioItem.objects.get(id=id)
+    item.delete()
+    return JsonResponse({'status': 'success'})
