@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
-import { Container, Header, Segment, Grid, Image, Modal, Divider, Button } from 'semantic-ui-react';
+import { Container, Header, Segment, Grid, Image, Modal, TextArea, Divider, Button } from 'semantic-ui-react';
 import { Form, FormField, FormInput, Dropdown } from 'semantic-ui-react';
 
 const PortfolioPage = () => {
     const [projects, setProjects] = useState([]);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [image, setImage] = useState('');
+    const [image, setImage] = useState(null);
     const [technology, setTechnology] = useState('');
+    const [backendFeatures, setBackendFeatures] = useState('');
+    const [frontendFeatures, setFrontendFeatures] = useState('');
     const [id, setId] = useState('');
 
     const [user, setUser] = useState('');
@@ -23,19 +25,21 @@ const PortfolioPage = () => {
 
     const [selectedProject, setSelectedProject] = useState(null);
 
-    const handleFormSubmit = () => {
-        axios.post(`${process.env.REACT_APP_API_URL}/api/portfolio/create`,
-        {
-            title: title,
-            description: description,
-            image: image,
-            technology: technology,
-        },
-        {
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('image', image);
+        formData.append('technology', technology);
+        formData.append('backend_features', backendFeatures);
+        formData.append('frontend_features', frontendFeatures);
+
+        axios.post(`${process.env.REACT_APP_API_URL}/api/portfolio/create`, formData, {
             withCredentials: true,
             headers: {
                 "X-CSRFToken": token,
-                "Content-Type": "application/json",
+                "Content-Type": "multipart/form-data",
             }
         }).then((response) => {
             console.log(response);
@@ -61,6 +65,14 @@ const PortfolioPage = () => {
         setTechnology(e.target.value);
     }
 
+    const handleBackendFeaturesChange = (e) => {
+        setBackendFeatures(e.target.value);
+    }
+
+    const handleFrontendFeaturesChange = (e) => {
+        setFrontendFeatures(e.target.value);
+    }
+
     const handleProjectSelect = (project) => {
         setSelectedProject(project);
         setId(project.id);
@@ -68,22 +80,30 @@ const PortfolioPage = () => {
         setDescription(project.description);
         setImage(project.image);
         setTechnology(project.technology);
+        setBackendFeatures(project.backend_features);
+        setFrontendFeatures(project.frontend_features);
     }
 
     const handleEditFormSubmit = (e) => {
         e.preventDefault();
-        axios.put(`${process.env.REACT_APP_API_URL}/api/portfolio/update/${id}`,
-        {
-            title: title,
-            description: description,
-            image: image,
-            technology: technology,
-        },
-        {
+        const formData = new FormData();
+        formData.append('title', title);
+        
+        formData.append('description', description);
+        if (image) {
+            formData.append('image', image);
+        }
+        formData.append('technology', technology);
+        formData.append('backend_features', backendFeatures);
+        formData.append('frontend_features', frontendFeatures);
+
+        console.log('id:', id, 'formData:', formData.get('title'), 'token:', token)
+    
+        axios.put(`${process.env.REACT_APP_API_URL}/api/portfolio/update/${id}`, formData, {
             withCredentials: true,
             headers: {
                 "X-CSRFToken": token,
-                "Content-Type": "application/json",
+                "Content-Type": "multipart/form-data",
             }
         }).then((response) => {
             console.log(response);
@@ -152,6 +172,7 @@ const PortfolioPage = () => {
                                 <FormInput
                                     label='Description'
                                     type='text'
+                                    control={TextArea}
                                     value={description}
                                     onChange={handleDescriptionChange}
                                 />
@@ -169,6 +190,24 @@ const PortfolioPage = () => {
                                     type='text'
                                     value={technology}
                                     onChange={handleTechnologyChange}
+                                />
+                            </FormField>
+                            <FormField>
+                                <FormInput
+                                    label='Backend Features'
+                                    type='text'
+                                    control={TextArea}
+                                    value={backendFeatures}
+                                    onChange={handleBackendFeaturesChange}
+                                />
+                            </FormField>
+                            <FormField>
+                                <FormInput
+                                    label='Frontend Features'
+                                    type='text'
+                                    control={TextArea}
+                                    value={frontendFeatures}
+                                    onChange={handleFrontendFeaturesChange}
                                 />
                             </FormField>
                             <Button type='submit'>Submit</Button>
@@ -228,6 +267,24 @@ const PortfolioPage = () => {
                                         onChange={handleTechnologyChange}
                                     />
                                 </FormField>
+                                <FormField>
+                                    <FormInput
+                                        label='Backend Features'
+                                        type='text'
+                                        control={TextArea}
+                                        value={backendFeatures}
+                                        onChange={handleBackendFeaturesChange}
+                                    />
+                                </FormField>
+                                <FormField>
+                                    <FormInput
+                                        label='Frontend Features'
+                                        type='text'
+                                        control={TextArea}
+                                        value={frontendFeatures}
+                                        onChange={handleFrontendFeaturesChange}
+                                    />
+                                </FormField>
                                 <Button type='submit'>Submit</Button>
                                 <Button onClick={() => setShowEditModal(false)}>Cancel</Button>
                                 <Button type='button' onClick={() => { setShowDeleteModal(true); setProjectToDelete(selectedProject); }}>Delete</Button>
@@ -255,13 +312,15 @@ const PortfolioPage = () => {
                     {projects.map((project) => (
                         <React.Fragment key={project.id}>
                             <Grid.Row>
-                                <Grid.Column width={8}>
-                                    <Image src={project.image} />
+                                <Grid.Column width={8} verticalAlign='middle' >
+                                    <Image src={`${project.image}`}  />
                                 </Grid.Column>
-                                <Grid.Column width={8}>
+                                <Grid.Column width={8} verticalAlign='middle' >
                                     <Header as='h2'>{project.title}</Header>
-                                    <p>{project.description}</p>
-                                    <p><em>{project.technology}</em></p>
+                                    <p><strong>Description: </strong>{project.description}</p>
+                                    <p><strong>Technologies: </strong><em>{project.technology}</em></p>
+                                    <p><strong>Backend Features:</strong> {project.backend_features}</p>
+                                    <p><strong>Frontend Features:</strong> {project.frontend_features}</p>
                                     {username === "\"admin\"" && (
                                         <>
                                             <Button onClick={() => { setShowEditModal(true); handleProjectSelect(project); }}>Edit</Button>

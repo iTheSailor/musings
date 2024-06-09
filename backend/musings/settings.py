@@ -59,6 +59,11 @@ INSTALLED_APPS = [
     'bootstrap5',
     'widget_tweaks',
     'api',
+    'sudoku',
+    'weather',
+    'todo',
+    'portfolio',
+
 ]
 
 MIDDLEWARE = [
@@ -71,6 +76,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'musings.middleware.HttpPutParsingMiddleware',
 ]
 
 ROOT_URLCONF = 'musings.urls'

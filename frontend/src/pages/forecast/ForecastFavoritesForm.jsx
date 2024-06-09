@@ -33,7 +33,7 @@ const FavoritesForm = ({onSubmit, handleClose}) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         axios.post(
-            `${process.env.REACT_APP_API_URL}/api/weather`,
+            `${process.env.REACT_APP_API_URL}/api/weather/`,
             {address, nickname, user, lat, lon, timezone, country_code},
         ).then((response) => {
             onSubmit(response.data);
