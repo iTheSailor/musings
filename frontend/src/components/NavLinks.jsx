@@ -18,11 +18,13 @@ const NavDropdown = () => (
         <DropdownItem href='/apps/forecast'>Forecast</DropdownItem>
         <DropdownItem href='/apps/sudoku'>Sudoku</DropdownItem>
         <DropdownItem href='/apps/todo'>To-Do List</DropdownItem>
+        <DropdownItem href='/apps/finance'>Finance</DropdownItem>
         <DropdownDivider />
         <DropdownHeader>Docs</DropdownHeader>
         <DropdownItem>Forecast</DropdownItem>
         <DropdownItem>Sudoku</DropdownItem>
         <DropdownItem>To-Do List</DropdownItem>
+        <DropdownItem>Finance</DropdownItem>
       </DropdownMenu>
     </Dropdown>
     <MenuItem className='link item' href='/portfolio'>Portfolio</MenuItem>

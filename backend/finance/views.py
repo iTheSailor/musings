@@ -3,13 +3,18 @@ from django.http import JsonResponse
 from .models import UserWatchlist
 import requests
 import os
-
-API_KEY = os.environ.get('ALPHA_VANTAGE_KEY')
+from icecream import ic
+from collections import OrderedDict
+import yfinance as yf
 
 # Create your views here.
 def get_stock(request):
-    symbol = request.GET.get('symbol')
-    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&apikey={API_KEY}'
-    response = requests.get(url)
-    data = response.json()
+    data = {}
+    if request.method == 'GET':
+        symbol = request.GET.get('symbol')
+        stock = yf.Ticker(symbol)
+        data = stock.info
+    
+
+
     return JsonResponse(data)

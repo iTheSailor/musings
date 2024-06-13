@@ -10,6 +10,7 @@ urlpatterns = [
     path('weather/', include('weather.urls')),
     path('todo/', include('todo.urls')),
     path('portfolio/', include('portfolio.urls')),
+    path('finance/', include('finance.urls')),
 ]
 
 router = routers.DefaultRouter()
