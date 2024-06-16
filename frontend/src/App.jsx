@@ -23,7 +23,7 @@ const BaseLayout = () => (
         <Route path="/apps/sudoku/game" element={<SudokuGame />} />
         <Route path="/apps/todo" element={<TodoPage />} />
         <Route path="/apps/finance" element={<FinancePage />} />
-        <Route path="/apps/finance/stock" element={<StockPage />} />
+        <Route path="/apps/finance/stock/:symbol" element={<StockPage />} />
         <Route path="/portfolio" element={<PortfolioPage />} />
 
       </Routes>

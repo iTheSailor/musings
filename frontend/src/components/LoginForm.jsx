@@ -7,6 +7,7 @@ import {
     Button
 } from 'semantic-ui-react';
 import { useState } from 'react';
+import Cookies from 'js-cookie';
 import PropTypes from 'prop-types';
 import { useAuth } from '../utils/AuthContext'; // Ensure this path is correct
 
@@ -61,6 +62,7 @@ const LoginForm = ({ onLoginSuccess, handleClose }) => {
                 localStorage.setItem('userId', JSON.stringify(userId))
                 let username = data.username
                 localStorage.setItem('username',JSON.stringify(username))
+                Cookies.set('csrftoken', data.csrf_token);
                 handleClose(); // Close the login form
                 window.location.reload();
             } else {

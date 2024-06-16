@@ -6,6 +6,9 @@ import os
 from icecream import ic
 from collections import OrderedDict
 import yfinance as yf
+from .forms import UserWatchlistForm
+from django.contrib.auth.models import User
+import json
 
 # Create your views here.
 def get_stock(request):
@@ -13,8 +16,55 @@ def get_stock(request):
     if request.method == 'GET':
         symbol = request.GET.get('symbol')
         stock = yf.Ticker(symbol)
-        data = stock.info
-    
+        user = request.GET.get('user')
+        user_watchlist = UserWatchlist.objects.filter(user=user)
+        watchlist = [watch.symbol for watch in user_watchlist]
+        data = {
+            'symbol': stock.info,
+            'watchlist': watchlist
+        }
+    return JsonResponse(data)
 
+def get_watchlist(request):
+    data = {}
+    if request.method == 'GET':
+        user = request.GET.get('user')
+        user = User.objects.get(id=user)
+        watchlist = UserWatchlist.objects.filter(user=user)
+        data = [watch.symbol for watch in watchlist]
+    return JsonResponse(data, safe=False)
+
+def add_watchlist(request):
+    data = {}
+    if request.method == 'POST':
+        form = UserWatchlistForm(request.POST)
+        if form.is_valid():
+            watchlist = form.save()
+            data = {'message': 'Watchlist added successfully'}
+        else:
+            data = form.errors
 
     return JsonResponse(data)
+
+def remove_watchlist(request):
+    data = {}
+    if request.method == 'POST':
+        ic(request.POST.dict())
+        data = request.POST.dict()
+        user = User.objects.get(id=data['user'])
+        symbol = data['symbol']
+        watchlist = UserWatchlist.objects.filter(user=user, symbol=symbol)
+        watchlist.delete()
+        data = {'message': 'Watchlist removed successfully'}
+    return JsonResponse(data)
+
+def get_watchlist_group(request):
+    data = {}
+    if request.method == 'GET':
+        user = request.user
+        group = request.GET.get('group')
+        watchlist = UserWatchlist.objects.filter(user=user, group=group)
+        data = [watch.symbol for watch in watchlist]
+    return JsonResponse(data)
+
+

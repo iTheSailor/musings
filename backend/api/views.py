@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
+from django.middleware.csrf import get_token
 
 
 class LoginView(APIView):
@@ -10,7 +11,8 @@ class LoginView(APIView):
         try:
             user = User.objects.get(username=username)
             if user.check_password(password):
-                return Response({'status': 'success', 'username': username, 'user_id': user.id, 'code': 200})
+                csrf_token = get_token(request)
+                return Response({'status': 'success', 'username': username, 'user_id': user.id, 'code': 200, 'csrf_token': csrf_token})
             else:
                 return Response({'status': 'failure', 'message': 'Invalid password', 'code': 401})
         except:
