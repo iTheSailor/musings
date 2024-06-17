@@ -9,6 +9,7 @@ import yfinance as yf
 from .forms import UserWatchlistForm
 from django.contrib.auth.models import User
 import json
+import pandas as pd
 
 # Create your views here.
 def get_stock(request):
@@ -65,6 +66,30 @@ def get_watchlist_group(request):
         group = request.GET.get('group')
         watchlist = UserWatchlist.objects.filter(user=user, group=group)
         data = [watch.symbol for watch in watchlist]
+    return JsonResponse(data)
+
+def get_full_stock(request):
+    if request.method == 'GET':
+        symbol = request.GET.get('symbol')
+        range = request.GET.get('range')
+        interval = request.GET.get('interval')
+        stock = yf.Ticker(symbol)
+        info = stock.info
+        news = stock.news
+        history = stock.history(period=range, interval=interval)
+        history_dict = {}
+        for date, data in history.iterrows():
+            history_dict[str(date)] = data.to_dict()
+        ic(type(history), type(stock.info), type(stock.news))
+        
+        data = {
+            'info': info,
+            'news': news,
+            'history': history_dict
+        }
+
+
+
     return JsonResponse(data)
 
 

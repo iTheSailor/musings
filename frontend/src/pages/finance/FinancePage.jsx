@@ -22,12 +22,21 @@ const FinancePage = () => {
             .catch(err => console.log(err));
     }, [user]);
 
+    useEffect(() => {
+        if (!open) {
+            setStock({});
+            console.log(stock);
+        }
+    }, []);
+
+
     const handleSearch = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/api/finance/get_stock`, {
             params: { symbol: symbol.toUpperCase(), user }
         })
             .then(res => {
                 setStock(res.data.symbol);
+                console.log(res.data.symbol);
                 setOpen(true);
                 setStockWatched(watchlist.includes(symbol.toUpperCase()));
             })
@@ -66,6 +75,8 @@ const FinancePage = () => {
             .catch(err => console.log(err));
     };
 
+    
+
     return (
         <Container>
             <Portal open={open} onClose={() => setOpen(false)}>
@@ -81,7 +92,7 @@ const FinancePage = () => {
                                         <Icon name='minus' color='black' />
                                         Remove</Button>
                                     :
-                                    <Button onClick={() => addToWatchlist(stock.symbol)} color='gray'>
+                                    <Button onClick={() => addToWatchlist(stock.symbol)} color='grey'>
                                         <Icon name='add' color='black' />
                                         Add to Watchlist
                                     </Button>
