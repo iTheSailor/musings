@@ -45,18 +45,24 @@ const Watchlist = ({ user, watchlist, removeFromWatchlist }) => {
         <Table celled>
             <Table.Header>
                 <Table.Row>
-                    <Table.HeaderCell>Symbol</Table.HeaderCell>
-                    <Table.HeaderCell>Name</Table.HeaderCell>
-                    <Table.HeaderCell>Current Price</Table.HeaderCell>
-                    <Table.HeaderCell>Daily Open</Table.HeaderCell>
-                    <Table.HeaderCell>Daily High</Table.HeaderCell>
-                    <Table.HeaderCell>Daily Low</Table.HeaderCell>
-                    <Table.HeaderCell>Actions</Table.HeaderCell>
+                    <Table.HeaderCell width={'1'}></Table.HeaderCell>
+                    <Table.HeaderCell width={'2'}>Symbol</Table.HeaderCell>
+                    <Table.HeaderCell width={'3'}>Name</Table.HeaderCell>
+                    <Table.HeaderCell width={'2'}>Current Price</Table.HeaderCell>
+                    <Table.HeaderCell width={'2'}>Daily Open</Table.HeaderCell>
+                    <Table.HeaderCell width={'2'}>Daily High</Table.HeaderCell>
+                    <Table.HeaderCell width={'2'}>Daily Low</Table.HeaderCell>
+                    <Table.HeaderCell width={'1'}>Actions</Table.HeaderCell>
                 </Table.Row>
             </Table.Header>
             <Table.Body>
                 {stocks.map(stock => (
                     <Table.Row key={stock.symbol} verticalAlign='middle'>
+                        <Table.Cell>
+                        <Button icon size='small' href={`/apps/finance/stock/${stock.symbol}`}>
+                                    <Icon name='angle double right' color="black" />
+                                </Button>
+                        </Table.Cell>
                         <Table.Cell>{stock.symbol}</Table.Cell>
                         <Table.Cell>{stock.shortName}</Table.Cell>
                         <Table.Cell>{Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.currentPrice)}</Table.Cell>
@@ -64,7 +70,7 @@ const Watchlist = ({ user, watchlist, removeFromWatchlist }) => {
                         <Table.Cell>{Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.regularMarketDayHigh)}</Table.Cell>
                         <Table.Cell>{Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.regularMarketDayLow)}</Table.Cell>
                         <Table.Cell>
-                            <Button icon color='red' onClick={() => removeFromWatchlist(stock.symbol)}>
+                            <Button icon color='red' size='small' onClick={() => removeFromWatchlist(stock.symbol)}>
                                 <Icon name='minus' />
                             </Button>
                         </Table.Cell>

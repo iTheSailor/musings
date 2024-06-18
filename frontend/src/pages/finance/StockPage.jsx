@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Container, Segment, Header, Grid, Button, Icon, Tab, Card, Image } from 'semantic-ui-react';
+import { Container, Segment, Header, Grid, Button, Icon, Tab, Card, Image, Form, Input } from 'semantic-ui-react';
+import Cookies from 'js-cookie';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, TimeScale } from 'chart.js';
 import 'chartjs-adapter-date-fns';
@@ -11,7 +12,9 @@ import zoomPlugin from 'chartjs-plugin-zoom';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, TimeScale, zoomPlugin);
 
 const StockPage = () => {
+    const [user, setUser] = useState(localStorage.getItem('userId') || null);
     const { symbol } = useParams();
+    const [ssymbol, setSsymbol] = useState('');
     const [stock, setStock] = useState(null);
     const [priceHistory, setPriceHistory] = useState({});
     const [loading, setLoading] = useState(true);
@@ -19,28 +22,94 @@ const StockPage = () => {
     const [news, setNews] = useState([]);
     const [range, setRange] = useState('1y');
     const [interval, setInterval] = useState('1d');
-
-    const fetchStockData = (symbol, range, interval) => {
-        axios.get(`${process.env.REACT_APP_API_URL}/api/finance/get_full_stock`, {
-            params: { symbol, range, interval }
-        })
-        .then(res => {
-            console.log(res.data);
-            setStock(res.data.info);
-            setPriceHistory(res.data.history);  // Assuming 'history' is part of the response
-            setOfficers(res.data.info.companyOfficers);
-            setNews(res.data.news);
-            setLoading(false);
-        })
-        .catch(err => {
-            console.log(err);
-            setLoading(false);
-        });
-    };
+    const [watchlist, setWatchlist] = useState([]);
+    const [stockWatched, setStockWatched] = useState(false);
 
     useEffect(() => {
-        fetchStockData(symbol, range, interval);
+        const fetchWatchlist = async () => {
+            try {
+                const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/finance/get_watchlist`, {
+                    params: { user }
+                });
+                setWatchlist(Array.isArray(res.data) ? res.data : []);
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        fetchWatchlist();
+    }, [user]);
+
+    useEffect(() => {
+        const fetchStockData = async () => {
+            try {
+                const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/finance/get_full_stock`, {
+                    params: { symbol, range, interval }
+                });
+                setStock(res.data.info);
+                setPriceHistory(res.data.history);  // Assuming 'history' is part of the response
+                setOfficers(res.data.info.companyOfficers);
+                setNews(res.data.news);
+                setLoading(false);
+                setSsymbol(res.data.info.symbol);
+            } catch (err) {
+                console.log(err);
+                setLoading(false);
+            }
+        };
+
+        fetchStockData();
     }, [symbol, range, interval]);
+
+    useEffect(() => {
+        if (stock && Array.isArray(watchlist)) {
+            setStockWatched(watchlist.includes(stock.symbol.toUpperCase()));
+        }
+    }, [stock, watchlist]);
+
+    const handleSearch = () => {
+        window.location = (`/apps/finance/stock/${ssymbol}`);
+    };
+
+    const addToWatchlist = async (ssymbol) => {
+        try {
+            const formData = new FormData();
+            formData.append('symbol', ssymbol);
+            formData.append('user', user);
+
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/finance/add_watchlist`, formData, {
+                withCredentials: true,
+                headers: { 'X-CSRFToken': Cookies.get('csrftoken') }
+            });
+
+            const updatedWatchlist = Array.isArray(res.data) ? res.data : [];
+            setWatchlist(updatedWatchlist);
+            setStockWatched(true);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const removeFromWatchlist = async (ssymbol) => {
+        try {
+            const formData = new FormData();
+            formData.append('symbol', ssymbol);
+            formData.append('user', user);
+
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/finance/remove_watchlist`, formData, {
+                withCredentials: true,
+                headers: { 'X-CSRFToken': Cookies.get('csrftoken') }
+            });
+
+            const updatedWatchlist = Array.isArray(res.data) ? res.data : [];
+            setWatchlist(updatedWatchlist);
+            if (!updatedWatchlist.includes(ssymbol.toUpperCase())) {
+                setStockWatched(false);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     if (loading) {
         return <Segment>Loading...</Segment>;
@@ -50,84 +119,78 @@ const StockPage = () => {
         return <Segment>No stock data available.</Segment>;
     }
 
-    const StockProfile = () => {
-        return (
-            <Segment>
-                <p>{stock.longName}</p>
-                <p>{stock.city}, {stock.state}</p>
-                <p>{stock.country}</p>
-                <p>{stock.industry}</p>
-                <p>{stock.sector}</p>
-            </Segment>
-        );
-    };
+    const StockProfile = () => (
+        <Segment>
+            <p>{stock.longName}</p>
+            <p>{stock.city}, {stock.state}</p>
+            <p>{stock.country}</p>
+            <p>{stock.industry}</p>
+            <p>{stock.sector}</p>
+        </Segment>
+    );
 
-    const StockFinancials = () => {
-        return (
-            <Segment>
-                <p>Market Cap: {stock.marketCap || null}</p>
-                <p>Revenue: {stock.revenue || null}</p>
-                <p>Net Income: {stock.netIncome || null}</p>
-                <p>EBITDA: {stock.ebitda || null}</p>
-                <p>EPS: {stock.eps || null}</p>
-                <p>Current Price: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.currentPrice)}</p>
-                <p>High: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.regularMarketDayHigh)}</p>
-                <p>Low: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.regularMarketDayLow)}</p>
-                <p>Open: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.regularMarketOpen)}</p>
-                <p>Close: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.regularMarketPreviousClose)}</p>
-                <p>Volume: {Intl.NumberFormat().format(stock.regularMarketVolume)}</p>
-                <p>Website: <a href={stock.website}>Home</a> / <a href={stock.irWebsite}>Investor Relations</a></p>
-                <p>Industry: {stock.industry}</p>
-                <p>Sector: {stock.sector}</p>
-                <p>Market Cap: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.marketCap)}</p>
-            </Segment>
-        );
-    };
+    const StockFinancials = () => (
+        <Segment>
+            <p>Market Cap: {stock.marketCap || null}</p>
+            <p>Revenue: {stock.revenue || null}</p>
+            <p>Net Income: {stock.netIncome || null}</p>
+            <p>EBITDA: {stock.ebitda || null}</p>
+            <p>EPS: {stock.eps || null}</p>
+            <p>Current Price: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.currentPrice)}</p>
+            <p>High: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.regularMarketDayHigh)}</p>
+            <p>Low: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.regularMarketDayLow)}</p>
+            <p>Open: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.regularMarketOpen)}</p>
+            <p>Close: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.regularMarketPreviousClose)}</p>
+            <p>Volume: {Intl.NumberFormat().format(stock.regularMarketVolume)}</p>
+            <p>Website: <a href={stock.website}>Home</a> / <a href={stock.irWebsite}>Investor Relations</a></p>
+            <p>Industry: {stock.industry}</p>
+            <p>Sector: {stock.sector}</p>
+            <p>Market Cap: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.marketCap)}</p>
+        </Segment>
+    );
 
-    const StockNews = () => {
-        return (
-            <>
-                {news.map((article, i) => {
-                    const imageUrl = article.thumbnail && article.thumbnail.resolutions && article.thumbnail.resolutions.length > 0
-                        ? article.thumbnail.resolutions[0].url
-                        : null;
+    const StockNews = () => (
+        <>
+            {news.map((article, i) => {
+                const imageUrl = article.thumbnail && article.thumbnail.resolutions && article.thumbnail.resolutions.length > 0
+                    ? article.thumbnail.resolutions[0].url
+                    : null;
 
-                    return (
-                        <Card key={i} fluid>
-                            <Card.Content>
-                                <Grid columns={2}>
-                                    <Grid.Column verticalAlign='middle' width={10}>
-                                        <a href={article.link}>
-                                            <Header as='h2'>
-                                                {article.title}
-                                            </Header>
-                                        </a>
-                                        <br />
-                                        <p>
-                                            <em>{article.publisher}</em>
-                                        </p>
-                                        <br />
-                                        <p>
-                                            Related Tickers: 
-                                            {article.relatedTickers.map((ticker, index) => (
-                                                <span key={index}>
-                                                    <a href={`/apps/finance/stock/${ticker}`}>{ticker}</a>
-                                                    {index < article.relatedTickers.length - 1 ? ', ' : ''}
-                                                </span>
-                                            ))}
-                                        </p>
-                                    </Grid.Column>
-                                    <Grid.Column textAlign='right' width={6}>
-                                        {imageUrl && <Image bordered size='medium' src={imageUrl} alt={article.title} />}
-                                    </Grid.Column>
-                                </Grid>
-                            </Card.Content>
-                        </Card>
-                    );
-                })}
-            </>
-        );
-    };
+                return (
+                    <Card key={i} fluid>
+                        <Card.Content>
+                            <Grid columns={2}>
+                                <Grid.Column verticalAlign='middle' width={10}>
+                                    <a href={article.link}>
+                                        <Header as='h2'>
+                                            {article.title}
+                                        </Header>
+                                    </a>
+                                    <br />
+                                    <p>
+                                        <em>{article.publisher}</em>
+                                    </p>
+                                    <br />
+                                    <p>
+                                        Related Tickers: 
+                                        {article.relatedTickers.map((ticker, index) => (
+                                            <span key={index}>
+                                                <a href={`/apps/finance/stock/${ticker}`}>{ticker}</a>
+                                                {index < article.relatedTickers.length - 1 ? ', ' : ''}
+                                            </span>
+                                        ))}
+                                    </p>
+                                </Grid.Column>
+                                <Grid.Column textAlign='right' width={6}>
+                                    {imageUrl && <Image bordered size='medium' src={imageUrl} alt={article.title} />}
+                                </Grid.Column>
+                            </Grid>
+                        </Card.Content>
+                    </Card>
+                );
+            })}
+        </>
+    );
 
     const StockAnalysis = () => {
         const dates = Object.keys(priceHistory);
@@ -251,7 +314,6 @@ const StockPage = () => {
                 },
             },
         };
-        
 
         return (
             <Segment>
@@ -298,13 +360,41 @@ const StockPage = () => {
     return (
         <Container>
             <Segment>
+                <Grid.Column textAlign='left' className='d-flex '>
+                    <Button icon href='/apps/finance'>
+                        <Icon name='arrow left' />  
+                    </Button>
+                    <Form onSubmit={handleSearch} className='w-100'>
+                        <Form.Field>
+                            <Input
+                                icon='search'
+                                placeholder='Enter stock symbol...'
+                                value={ssymbol}
+                                onChange={e => setSsymbol(e.target.value)}
+                            />
+                        </Form.Field>
+                    </Form>
+                </Grid.Column>
+            </Segment>
+            <Segment>
                 <Grid columns={2}>
                     <Grid.Column textAlign='left' className='d-flex align-items-center'>
-                        <Button icon>
-                            <Icon name='arrow left' />
-                            Back
-                        </Button>
                         <Header as='h2' className='m-0'> {stock.symbol} - {stock.shortName}</Header>
+                        {stockWatched ? (
+                            <>
+                                <Button size='mini' icon inverted onClick={() => removeFromWatchlist(ssymbol)}>
+                                    <Icon name='minus' color='red' />
+                                </Button>
+                                <span><em>remove from watchlist</em></span>
+                            </>
+                        ) : (
+                            <>
+                                <Button size='mini' icon inverted onClick={() => addToWatchlist(ssymbol)}>
+                                    <Icon name='add' color='green' />
+                                </Button>
+                                <span><em>add to watchlist</em></span>
+                            </>
+                        )}
                     </Grid.Column>
                     <Grid.Column textAlign='right' verticalAlign='middle'>
                         <p><em>{stock.address1 || null} {stock.address2 || null} {stock.city} {stock.state || null} {stock.zip || null} {stock.country || null} </em></p>

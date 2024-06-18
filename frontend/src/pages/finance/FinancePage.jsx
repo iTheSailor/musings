@@ -92,7 +92,7 @@ const FinancePage = () => {
                                         <Icon name='minus' color='black' />
                                         Remove</Button>
                                     :
-                                    <Button onClick={() => addToWatchlist(stock.symbol)} color='grey'>
+                                    <Button onClick={() => addToWatchlist(stock.symbol)} color='green'>
                                         <Icon name='add' color='black' />
                                         Add to Watchlist
                                     </Button>
