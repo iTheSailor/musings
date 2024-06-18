@@ -18,7 +18,7 @@ const FinancePage = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/api/finance/get_watchlist`, {
             params: { user }
         })
-            .then(res => setWatchlist(res.data))
+            .then(res => setWatchlist(res.data.symbols))
             .catch(err => console.log(err));
     }, [user]);
 

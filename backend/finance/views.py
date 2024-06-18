@@ -32,8 +32,13 @@ def get_watchlist(request):
         user = request.GET.get('user')
         user = User.objects.get(id=user)
         watchlist = UserWatchlist.objects.filter(user=user)
-        data = [watch.symbol for watch in watchlist]
-    return JsonResponse(data, safe=False)
+        symbols = [watch.symbol for watch in watchlist]
+        ic(symbols, type(symbols))
+        data = {
+            'symbols': symbols,
+            'success': True
+        }
+    return JsonResponse(data)
 
 def add_watchlist(request):
     data = {}
@@ -41,7 +46,7 @@ def add_watchlist(request):
         form = UserWatchlistForm(request.POST)
         if form.is_valid():
             watchlist = form.save()
-            data = {'message': 'Watchlist added successfully'}
+            data = {'message': 'Watchlist added successfully', 'success': True}
         else:
             data = form.errors
 
@@ -56,7 +61,7 @@ def remove_watchlist(request):
         symbol = data['symbol']
         watchlist = UserWatchlist.objects.filter(user=user, symbol=symbol)
         watchlist.delete()
-        data = {'message': 'Watchlist removed successfully'}
+        data = {'message': 'Watchlist removed successfully', 'success': True}
     return JsonResponse(data)
 
 def get_watchlist_group(request):

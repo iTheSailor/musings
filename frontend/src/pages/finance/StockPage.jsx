@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Container, Segment, Header, Grid, Button, Icon, Tab, Card, Image, Form, Input } from 'semantic-ui-react';
+import { Container, Segment, Header, Grid, Button, Icon, Tab, Card, Image, Form, Input, Divider } from 'semantic-ui-react';
 import Cookies from 'js-cookie';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, TimeScale } from 'chart.js';
@@ -31,7 +31,13 @@ const StockPage = () => {
                 const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/finance/get_watchlist`, {
                     params: { user }
                 });
-                setWatchlist(Array.isArray(res.data) ? res.data : []);
+                if (res.data.success) {
+                    console.log(res.data.symbols);
+                    console.log(res.data);
+                    setWatchlist(res.data.symbols);
+                } else {
+                    console.log(res.data.message);
+                }
             } catch (err) {
                 console.log(err);
             }
@@ -64,6 +70,7 @@ const StockPage = () => {
     useEffect(() => {
         if (stock && Array.isArray(watchlist)) {
             setStockWatched(watchlist.includes(stock.symbol.toUpperCase()));
+            console.log(watchlist, stock.symbol.toUpperCase(), watchlist.includes(stock.symbol.toUpperCase()));
         }
     }, [stock, watchlist]);
 
@@ -76,40 +83,44 @@ const StockPage = () => {
             const formData = new FormData();
             formData.append('symbol', ssymbol);
             formData.append('user', user);
-
+    
             const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/finance/add_watchlist`, formData, {
                 withCredentials: true,
                 headers: { 'X-CSRFToken': Cookies.get('csrftoken') }
             });
-
-            const updatedWatchlist = Array.isArray(res.data) ? res.data : [];
-            setWatchlist(updatedWatchlist);
-            setStockWatched(true);
+    
+            if (res.data.success) {
+                setWatchlist((prevWatchlist) => [...(prevWatchlist || []), ssymbol.toUpperCase()]);
+                setStockWatched(true);
+            }
         } catch (err) {
             console.log(err);
         }
     };
-
+    
     const removeFromWatchlist = async (ssymbol) => {
         try {
             const formData = new FormData();
             formData.append('symbol', ssymbol);
+            
             formData.append('user', user);
-
+            console.log(ssymbol, user);
             const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/finance/remove_watchlist`, formData, {
                 withCredentials: true,
                 headers: { 'X-CSRFToken': Cookies.get('csrftoken') }
             });
-
-            const updatedWatchlist = Array.isArray(res.data) ? res.data : [];
-            setWatchlist(updatedWatchlist);
-            if (!updatedWatchlist.includes(ssymbol.toUpperCase())) {
+    
+            if (res.data.success) {
+                setWatchlist((prevWatchlist) => (prevWatchlist || []).filter((item) => item !== ssymbol.toUpperCase()));
                 setStockWatched(false);
             }
         } catch (err) {
             console.log(err);
         }
     };
+    
+    
+    
 
     if (loading) {
         return <Segment>Loading...</Segment>;
@@ -121,11 +132,46 @@ const StockPage = () => {
 
     const StockProfile = () => (
         <Segment>
-            <p>{stock.longName}</p>
-            <p>{stock.city}, {stock.state}</p>
-            <p>{stock.country}</p>
-            <p>{stock.industry}</p>
-            <p>{stock.sector}</p>
+            <Grid columns={2}>
+                <Grid.Column width={8}>
+                    <Header as='h2'>Company Information</Header>
+                        <Grid columns={2}>
+                            <Grid.Column width={8}>
+                                <p><strong>Symbol:</strong></p>
+                                <Divider />
+                                <p><strong>Short Name:</strong></p>
+                                <Divider />
+                                <p><strong>Location:</strong></p>
+                                <Divider />
+                                <p><strong>Industry:</strong></p>
+                                <Divider />
+                                <p><strong>Sector:</strong></p>
+                                <Divider />
+                                <p><strong>Employees:</strong></p>
+                                <Divider />
+                                </Grid.Column>
+                                <Grid.Column  textAlign='right'>
+                                    <p>{stock.symbol}</p>
+                                    <Divider />
+                                    <p>{stock.shortName}</p>
+                                    <Divider />
+                                    <p>{stock.city}, {stock.state}, {stock.country}</p>
+                                    <Divider />
+                                    <p>{stock.industry}</p>
+                                    <Divider />
+                                    <p>{stock.sector}</p>
+                                    <Divider />
+                                    <p>{stock.fullTimeEmployees}</p>
+                                    <Divider />
+                                </Grid.Column>
+                        </Grid>
+                </Grid.Column>
+                <Divider vertical />
+                <Grid.Column width={8}>
+                    <Header as='h2'>Company Description</Header>
+                    <p>{stock.longBusinessSummary}</p>
+                </Grid.Column>
+            </Grid>
         </Segment>
     );
 
@@ -384,29 +430,30 @@ const StockPage = () => {
             </Segment>
             <Segment>
                 <Grid columns={2}>
-                    <Grid.Column textAlign='left' className='d-flex align-items-center'>
-                        <Button icon href='/apps/finance'>
-                            <Icon name='arrow left' />
-                            Back
-                        </Button>
-                        <Header as='h2' className='m-0'> {stock.symbol} - {stock.shortName}</Header>
-                        {stockWatched ? (
-                            <>
-                                <Button size='mini' icon inverted onClick={() => removeFromWatchlist(ssymbol)}>
-                                    <Icon name='minus' color='red' />
-                                </Button>
-                                <span><em>remove from watchlist</em></span>
-                            </>
-                        ) : (
-                            <>
-                                <Button size='mini' icon inverted onClick={() => addToWatchlist(ssymbol)}>
-                                    <Icon name='add' color='green' />
-                                </Button>
-                                <span><em>add to watchlist</em></span>
-                            </>
-                        )}
-                    </Grid.Column>
-                    <Grid.Column textAlign='right' verticalAlign='middle'>
+                <Grid.Column textAlign='left' className='d-flex align-items-center' width={10} >
+                    <Button icon href='/apps/finance'>
+                        <Icon name='arrow left' />
+                        Back
+                    </Button>
+                    <Header as='h2' className='m-0'> {stock.symbol} - {stock.shortName}</Header>
+                    {stockWatched ? (
+                        <>
+                            <Button size='mini' icon inverted onClick={() => removeFromWatchlist(ssymbol)}>
+                                <Icon name='minus' color='red' />
+                            </Button>
+                            <span><em>remove from watchlist</em></span>
+                        </>
+                    ) : (
+                        <>
+                            <Button size='mini' icon inverted onClick={() => addToWatchlist(ssymbol)}>
+                                <Icon name='add' color='green' />
+                            </Button>
+                            <span><em>add to watchlist</em></span>
+                        </>
+                    )}
+                </Grid.Column>
+
+                    <Grid.Column textAlign='right' verticalAlign='middle' width={'6'}>
                         <p><em>{stock.address1 || null} {stock.address2 || null} {stock.city} {stock.state || null} {stock.zip || null} {stock.country || null} </em></p>
                     </Grid.Column>
                 </Grid>
