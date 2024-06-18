@@ -135,7 +135,13 @@ const FinancePage = () => {
             </Portal>
 
             <Segment>
-                <Header as='h1'>Finance</Header>
+            <span className='d-flex align-items-center'>
+                <Icon name='dollar'  circular />
+                <Header as='h1' className='m-0' >
+                    <Header.Content>Finance</Header.Content>
+                </Header>
+            </span>
+                
                 <p>Search for a stock symbol to get the latest information.</p>
                 <Form onSubmit={handleSearch}>
                     <Form.Field>

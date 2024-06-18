@@ -1,7 +1,14 @@
 import React from 'react';
 import { Segment, Grid, Header, Button } from 'semantic-ui-react';
-import { Line } from 'react-chartjs-2';
 import PropTypes from 'prop-types';
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, TimeScale } from 'chart.js';
+import 'chartjs-adapter-date-fns';
+import zoomPlugin from 'chartjs-plugin-zoom';
+
+// Register the components for Chart.js
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, TimeScale, zoomPlugin);
+
 
 const StockAnalysis = ({ priceHistory, range, interval, setRange, setInterval }) => {
     const dates = Object.keys(priceHistory);
@@ -140,24 +147,24 @@ const StockAnalysis = ({ priceHistory, range, interval, setRange, setInterval })
                 </Grid.Column>
                 <Grid.Column floated='right'>
                     <Button.Group floated='right' size='mini'>
-                        <Button onClick={() => setRange('1d')}>Day</Button>
-                        <Button onClick={() => setRange('5d')}>Week</Button>
-                        <Button onClick={() => setRange('1mo')}>Month</Button>
-                        <Button onClick={() => setRange('3mo')}>3M</Button>
-                        <Button onClick={() => setRange('6mo')}>6M</Button>
-                        <Button onClick={() => setRange('1y')}>1Y</Button>
-                        <Button onClick={() => setRange('5y')}>5Y</Button>
-                        <Button onClick={() => setRange('max')}>Max</Button>
+                        <Button active={range === '1d'} onClick={() => setRange('1d')}>Day</Button>
+                        <Button active={range === '5d'} onClick={() => setRange('5d')}>Week</Button>
+                        <Button active={range === '1mo'} onClick={() => setRange('1mo')}>Month</Button>
+                        <Button active={range === '3mo'} onClick={() => setRange('3mo')}>3M</Button>
+                        <Button active={range === '6mo'} onClick={() => setRange('6mo')}>6M</Button>
+                        <Button active={range === '1y'} onClick={() => setRange('1y')}>1Y</Button>
+                        <Button active={range === '5y'} onClick={() => setRange('5y')}>5Y</Button>
+                        <Button active={range === 'max'} onClick={() => setRange('max')}>Max</Button>
                     </Button.Group>
                     <Button.Group floated='right' size='mini' toggle>
-                        <Button onClick={() => setInterval('1m')}>1m</Button>
-                        <Button onClick={() => setInterval('5m')}>5m</Button>
-                        <Button onClick={() => setInterval('15m')}>15m</Button>
-                        <Button onClick={() => setInterval('30m')}>30m</Button>
-                        <Button onClick={() => setInterval('1h')}>1h</Button>
-                        <Button onClick={() => setInterval('1d')}>1d</Button>
-                        <Button onClick={() => setInterval('1wk')}>1w</Button>
-                        <Button onClick={() => setInterval('1mo')}>1mo</Button>
+                        <Button active={interval === '1m'} disabled={range !== '1d' && range !== '5d'} onClick={() => setInterval('1m')}>1m</Button>
+                        <Button active={interval === '5m'} disabled={range !== '1d' && range !== '5d'} onClick={() => setInterval('5m')}>5m</Button>
+                        <Button active={interval === '15m'} disabled={range !== '1d' && range !== '5d'} onClick={() => setInterval('15m')}>15m</Button>
+                        <Button active={interval === '30m'} disabled={range !== '1d' && range !== '5d'} onClick={() => setInterval('30m')}>30m</Button>
+                        <Button active={interval === '1h'} disabled={range !== '1d' && range !== '5d' && range !== '1mo'} onClick={() => setInterval('1h')}>1h</Button>
+                        <Button active={interval === '1d'} onClick={() => setInterval('1d')}>1d</Button>
+                        <Button active={interval === '1wk' } disabled={ range!== '1mo' && range !== '3mo' && range !== '6mo' && range !=='1y' && range !== '5y' && range !== 'max'} onClick={() => setInterval('1wk')}>1w</Button>
+                        <Button active={interval === '1mo'} disabled={range !== '3mo' && range !== '6mo' && range !=='1y' && range !== '5y' && range !== 'max' }onClick={() => setInterval('1mo')}>1mo</Button>
                     </Button.Group>
                 </Grid.Column>
             </Grid>
@@ -174,4 +181,5 @@ StockAnalysis.propTypes = {
     setRange: PropTypes.func.isRequired,
     setInterval: PropTypes.func.isRequired,
 };
+
 export default StockAnalysis;
