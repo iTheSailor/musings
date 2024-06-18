@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Icon, Button } from 'semantic-ui-react';
+import { Table, Icon, Button, Header } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 const Watchlist = ({ user, watchlist, removeFromWatchlist }) => {
@@ -42,6 +42,14 @@ const Watchlist = ({ user, watchlist, removeFromWatchlist }) => {
     }
 
     return (
+        <>
+        <span className='d-flex align-items-center'>
+        <Icon name='chart line'  circular />
+        <Header as='h2' className='m-0' >
+            <Header.Content>Watchlist</Header.Content>
+        </Header>
+        </span>
+
         <Table celled>
             <Table.Header>
                 <Table.Row>
@@ -83,6 +91,7 @@ const Watchlist = ({ user, watchlist, removeFromWatchlist }) => {
                 )}
             </Table.Body>
         </Table>
+        </>
     );
 };
 
