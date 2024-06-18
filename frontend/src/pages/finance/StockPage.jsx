@@ -65,11 +65,6 @@ const StockPage = () => {
     const StockFinancials = () => {
         return (
             <Segment>
-                <p>Market Cap: {stock.marketCap || null}</p>
-                <p>Revenue: {stock.revenue || null}</p>
-                <p>Net Income: {stock.netIncome || null}</p>
-                <p>EBITDA: {stock.ebitda || null}</p>
-                <p>EPS: {stock.eps || null}</p>
                 <p>Current Price: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.currentPrice)}</p>
                 <p>High: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.regularMarketDayHigh)}</p>
                 <p>Low: {Intl.NumberFormat("en-US", { style: 'currency', currency: 'USD' }).format(stock.regularMarketDayLow)}</p>
@@ -193,10 +188,13 @@ const StockPage = () => {
                 x: {
                     type: 'time',
                     time: {
-                        unit: 'day',
+                        unit: interval === '1m' || interval === '5m' || interval === '15m' || interval === '30m' || interval === '1h' ? 'minute' :
+                              interval === '1d' ? 'day' :
+                              interval === '1wk' ? 'week' :
+                              'month', // default to month
                     },
-                    min: dates[0],
-                    max: dates[dates.length - 1],
+                    min: new Date(dates[0]).getTime(),
+                    max: new Date(dates[dates.length - 1]).getTime(),
                 },
                 y: {
                     type: 'linear',
@@ -204,13 +202,16 @@ const StockPage = () => {
                     position: 'left',
                     min: Math.min(...lows) * 0.9,
                     max: Math.max(...highs) * 1.1,
+                    ticks: {
+                        beginAtZero: true,
+                    },
                 },
                 y1: {
                     type: 'linear',
                     display: true,
                     position: 'right',
                     min: 0,
-                    max: Math.max(...volumes) * 1.1,
+                    max: Math.max(...volumes) * 1.2,
                     grid: {
                         drawOnChartArea: false,
                     },
@@ -220,8 +221,8 @@ const StockPage = () => {
                 zoom: {
                     limits: {
                         x: {
-                            min: new Date(dates[0]).getTime(), // Minimum timestamp
-                            max: new Date(dates[dates.length - 1]).getTime(), // Maximum timestamp
+                            min: new Date(dates[0]).getTime(),
+                            max: new Date(dates[dates.length - 1]).getTime(),
                             minRange: 1000 * 60 * 60 * 24, // 1 day in milliseconds
                             maxRange: 1000 * 60 * 60 * 24 * 30, // 30 days in milliseconds
                         },
@@ -236,7 +237,7 @@ const StockPage = () => {
                     },
                     pan: {
                         enabled: true,
-                        mode: 'xy',
+                        mode: 'x',
                         threshold: 5,
                     },
                     zoom: {
@@ -246,11 +247,13 @@ const StockPage = () => {
                         pinch: {
                             enabled: true,
                         },
-                        mode: 'xy',
+                        mode: 'x',
                     },
                 },
             },
         };
+        
+        
         
 
         return (
@@ -300,7 +303,7 @@ const StockPage = () => {
             <Segment>
                 <Grid columns={2}>
                     <Grid.Column textAlign='left' className='d-flex align-items-center'>
-                        <Button icon>
+                        <Button icon href='/apps/finance'>
                             <Icon name='arrow left' />
                             Back
                         </Button>
