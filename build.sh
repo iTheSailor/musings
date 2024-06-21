@@ -26,8 +26,12 @@ npm run build
 npm install -g serve
 
 #create .env file for the frontend
+echo "REACT_APP_API_URL=http://localhost:8000" > .env.local
 echo "REACT_APP_API_URL=http://localhost:8000" > .env
+
 
 #run frontend 
 
 serve -s build
+
+cd ../backend
