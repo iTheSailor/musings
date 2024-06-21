@@ -23,6 +23,8 @@ npm install
 
 npm run build
 
+npm install -g serve
+
 #run frontend 
 
 serve -s build
