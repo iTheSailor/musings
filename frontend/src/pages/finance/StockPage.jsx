@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Container, Segment, Header, Grid, Button, Icon, Tab, Form, Input, Divider } from 'semantic-ui-react';
 import Cookies from 'js-cookie';
 import StockProfile from './StockProfileComponent';
-import StockFinancials from './StockFinancialsComponent';
+import StockBoard from './StockBoardComponent';
 import StockNews from './StockNewsComponent';
 import StockAnalysis from './StockAnalysisComponent';
 
@@ -125,7 +125,7 @@ const StockPage = () => {
 
     const panes = [
         { menuItem: 'Profile', render: () => <Tab.Pane><StockProfile stock={stock} /></Tab.Pane> },
-        { menuItem: 'Financials', render: () => <Tab.Pane><StockFinancials stock={stock} /></Tab.Pane> },
+        { menuItem: 'Board', render: () => <Tab.Pane><StockBoard stock={stock} board={officers}/></Tab.Pane> },
         { menuItem: 'News', render: () => <Tab.Pane><StockNews news={news} /></Tab.Pane> },
         { menuItem: 'Analysis', render: () => <Tab.Pane><StockAnalysis priceHistory={priceHistory} range={range} interval={interval} setRange={setRange} setInterval={setInterval} /></Tab.Pane> },
     ];
@@ -152,10 +152,7 @@ const StockPage = () => {
             <Segment>
                 <Grid columns={2}>
                     <Grid.Column textAlign='left' className='d-flex align-items-center' width={10} >
-                        <Button icon href='/apps/finance'>
-                            <Icon name='arrow left' />
-                            Back
-                        </Button>
+                        
                         <Header as='h2' className='m-0'> {stock.symbol} - {stock.shortName}</Header>
                         {stockWatched ? (
                             <>
