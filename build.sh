@@ -4,9 +4,6 @@ cd backend
 # Install dependencies
 pip install -r requirements.txt
 
-# Move React build to Django static folder
-mv ../frontend/build/*  ../backend/static/
-
 # Collect static files
 python manage.py collectstatic --no-input
 
